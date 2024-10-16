@@ -1,12 +1,12 @@
 const bcrypt = require('bcrypt'); 
 const express = require('express');
 const { check, validationResult } = require('express-validator');
-const User = require('../models/user'); 
+const { User } = require('../models'); 
 const router = express.Router();
 
 // registrar un nuevo usuario
 router.post(
-    '/users',
+    '/',
     [
         // Validaciones
         check('dni').isInt().withMessage('El DNI debe ser un número entero.'),
@@ -30,7 +30,8 @@ router.post(
             const user = await User.create({ dni, password: hashedPassword, role });
             return res.status(201).json({ message: 'Usuario creado', userId: user.id });
         } catch (error) {
-            return res.status(500).json({ error: 'Error al crear el usuario' });
+            console.error('Error al crear el usuario:', error)
+            return res.status(500).json({ error: 'Error al crear el usuario', details: error.message });
         }
     }
 );
