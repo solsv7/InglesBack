@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { Term } = require('../models');
 
-// Crear un nuevo término
+
 router.post('/', async (req, res) => {
     try {
         const term = await Term.create(req.body);
@@ -12,7 +12,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-// Obtener todos los términos (opcional)
+
 router.get('/', async (req, res) => {
     try {
         const terms = await Term.findAll();

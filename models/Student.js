@@ -5,7 +5,7 @@ module.exports = (sequelize) => {
         userId: {
             type: DataTypes.INTEGER,
             references: {
-                model: 'Users', // El nombre de la tabla generada
+                model: 'Users',
                 key: 'id',
             },
             allowNull: false,
@@ -16,6 +16,6 @@ module.exports = (sequelize) => {
         },
     });
 
-    return Student; // Devolver el modelo
+    return Student; 
 };
 

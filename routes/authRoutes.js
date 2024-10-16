@@ -3,14 +3,33 @@ const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const { User } = require('../models'); 
 const jwt = require('jsonwebtoken');
+const { Student } = require('../models');
+
 
 const router = express.Router();
-// models/authRoutes.js
+
+// Middleware para validar el token JWT
+const authenticateToken = (req, res, next) => {
+    const token = req.headers['authorization']?.split(' ')[1];
+    console.log(token)
+    if (!token) return res.sendStatus(401);
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) return res.sendStatus(403);
+        req.user = user;
+        next();
+    });
+};
+
+
+
+// Ruta de inicio de sesión
 router.post('/login', async (req, res) => {
     const { dni, password } = req.body;
 
     try {
         const user = await User.findOne({ where: { dni } });
+
         if (!user) {
             return res.status(401).json({ message: 'Credenciales inválidas' });
         }
@@ -20,18 +39,28 @@ router.post('/login', async (req, res) => {
             return res.status(401).json({ message: 'Credenciales inválidas' });
         }
 
-        // Generar el token
-        const token = jwt.sign({ id: user.id, dni: user.dni, role: user.role }, 'tu_clave_secreta', {
+        const student = await Student.findOne({ where: { userId: user.id } });
+
+        const token = jwt.sign({ id: user.id, dni: user.dni, role: user.role }, process.env.JWT_SECRET, {
             expiresIn: '1h',
         });
 
-        return res.status(200).json({ token });
+        return res.status(200).json({
+            token,
+            studentId: student ? student.id : null, 
+            studentName: student ? student.name : null, 
+        });
     } catch (error) {
         console.error('Error al iniciar sesión:', error);
         return res.status(500).json({ message: 'Error al iniciar sesión' });
     }
 });
 
+
+
+
+
+// Ruta de registro
 router.post(
     '/register',
     [
@@ -69,7 +98,9 @@ router.post(
     }
 );
 
-router.get('/users', async (req, res) => {
+// Ruta para obtener todos los usuarios (requiere autenticación)
+
+router.get('/users', authenticateToken, async (req, res) => {
     try {
         const users = await User.findAll(); 
         res.json(users); 
@@ -78,5 +109,5 @@ router.get('/users', async (req, res) => {
     }
 });
 
-
 module.exports = router;
+

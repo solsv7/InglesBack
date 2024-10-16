@@ -26,7 +26,7 @@ router.get('/', async (req, res) => {
 // PUT /students/:id
 router.put('/students/:id', async (req, res) => {
     const { id } = req.params;
-    const { name, userId } = req.body; // Asegúrate de enviar los campos que deseas actualizar
+    const { name, userId } = req.body; 
 
     try {
         const student = await Student.findByPk(id);
@@ -55,9 +55,9 @@ router.delete('/students/:id', async (req, res) => {
             return res.status(404).json({ message: 'Estudiante no encontrado' });
         }
 
-        await student.destroy(); // Elimina el estudiante
+        await student.destroy(); 
 
-        return res.status(204).send(); // No se necesita contenido en la respuesta
+        return res.status(204).send(); 
     } catch (error) {
         console.error('Error al eliminar el estudiante:', error);
         return res.status(500).json({ message: 'Error al eliminar el estudiante' });

@@ -3,7 +3,7 @@ const cors = require('cors');
 const db = require('./models/index');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/users');
-const studentRoutes = require('./routes/studentsRoutes'); // Nueva ruta
+const studentRoutes = require('./routes/studentsRoutes'); 
 const gradesRouter = require('./routes/routesGrades');
 const categoryRoutes = require('./routes/routesCategory'); 
 const termRoutes = require('./routes/routesTerm');
@@ -29,11 +29,11 @@ app.use('/api/grades', gradesRouter);
 app.use('/api/categories', categoryRoutes); 
 app.use('/api/terms', termRoutes);
 
-// Establecer relaciones entre modelos
+
 const User = db.User;
 const Student = db.Student;
 
-// Relación uno a muchos
+
 User.hasMany(Student, { foreignKey: 'userId' });
 Student.belongsTo(User, { foreignKey: 'userId' });
 

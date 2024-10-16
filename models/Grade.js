@@ -4,12 +4,12 @@ module.exports = (sequelize) => {
     return sequelize.define('Grade', {
         value: {
             type: DataTypes.INTEGER,
-            allowNull: false, // Nota del estudiante
+            allowNull: false, 
         },
         studentId: {
             type: DataTypes.INTEGER,
             references: {
-                model: 'Students', // Asegúrate de que sea el nombre de la tabla
+                model: 'Students', 
                 key: 'id',
             },
             allowNull: false,
@@ -17,7 +17,7 @@ module.exports = (sequelize) => {
         termId: {
             type: DataTypes.INTEGER,
             references: {
-                model: 'Terms', // Asegúrate de que sea el nombre de la tabla
+                model: 'Terms', 
                 key: 'id',
             },
             allowNull: false,
@@ -25,7 +25,7 @@ module.exports = (sequelize) => {
         categoryId: {
             type: DataTypes.INTEGER,
             references: {
-                model: 'Categories', // Asegúrate de que sea el nombre de la tabla
+                model: 'Categories', 
                 key: 'id',
             },
             allowNull: false,

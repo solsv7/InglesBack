@@ -1,8 +1,8 @@
-const express = require('express'); // Asegúrate de que esta línea solo esté una vez
+const express = require('express'); 
 const router = express.Router();
 const { Grade } = require('../models');
 
-// Rutas para manejar Grades
+
 router.post('/', async (req, res) => {
     try {
         const grade = await Grade.create(req.body);
@@ -12,15 +12,15 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.get('/', async (req, res) => {
+router.get('/student/:studentId', async (req, res) => {
+    const { studentId } = req.params;
     try {
-        const grades = await Grade.findAll();
+        const grades = await Grade.findAll({ where: { studentId } });
         res.json(grades);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// Agrega PUT y DELETE según sea necesario
 
 module.exports = router;
