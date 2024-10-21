@@ -1,14 +1,14 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 const cors = require('cors');
-const db = require('./models/index');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/users');
 const studentRoutes = require('./routes/studentsRoutes'); 
-const gradesRouter = require('./routes/routesGrades');
-const categoryRoutes = require('./routes/routesCategory'); 
-const termRoutes = require('./routes/routesTerm');
+const authenticateToken = require('./middlewares/authMiddleware'); 
 
 require('dotenv').config();
+
+const sequelize = require('./config/database');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -20,24 +20,17 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use(bodyParser.json());
 
-// Usar las rutas
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/students', studentRoutes); 
-app.use('/api/grades', gradesRouter);
-app.use('/api/categories', categoryRoutes); 
-app.use('/api/terms', termRoutes);
 
+app.get('/api/secure-data', authenticateToken, (req, res) => {
+    res.json({ message: 'Datos protegidos', user: req.user });
+});
 
-const User = db.User;
-const Student = db.Student;
-
-
-User.hasMany(Student, { foreignKey: 'userId' });
-Student.belongsTo(User, { foreignKey: 'userId' });
-
-db.sequelize.sync({ alter: true }) 
+sequelize.sync()
     .then(() => {
         console.log('Base de datos sincronizada');
         app.listen(PORT, () => {

@@ -1,7 +1,7 @@
-PUT http://localhost:3001/api/users/1
+PUT http://localhost:3001/api/auth/actualizar-contrasenia
 Content-Type: application/json
 
 {
-    "dni": 41991328,        
-    "password": "1234"
+    "id_usuario": 2,
+    "nueva_contrasenia": "1234567"
 }
