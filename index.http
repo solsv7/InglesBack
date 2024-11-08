@@ -1,7 +1,9 @@
-PUT http://localhost:3001/api/auth/actualizar-contrasenia
+POST http://localhost:3001/api/grades/subir
 Content-Type: application/json
 
 {
-    "id_usuario": 2,
-    "nueva_contrasenia": "1234567"
+    "idAlumno": 2,
+    "idPeriodo": 4,
+    "idTipoNota": 5,
+    "nota": 9
 }

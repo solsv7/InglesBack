@@ -12,10 +12,7 @@ async function crearEstudiante(req, res) {
     }
 
     try {
-        await sequelize.query('CALL crearEstudiante(:dni_alumno, :nombre, :id_clase)', {
-            replacements: { dni_alumno, nombre, id_clase },
-            type: sequelize.QueryTypes.RAW 
-        });
+        await sequelize.query(`CALL crearEstudiante(${dni_alumno}, ${nombre}, ${id_clase}`);
 
         res.status(201).json({ message: 'Estudiante creado correctamente' });
     } catch (error) {

@@ -4,7 +4,11 @@ const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/users');
 const studentRoutes = require('./routes/studentsRoutes'); 
-const authenticateToken = require('./middlewares/authMiddleware'); 
+const gradesRoutes = require('./routes/Grades');
+const categoriesRoutes = require ('./routes/categoriesRoutes');
+const periodosRoutes = require('./routes/periodosRoutes');
+const authenticateToken = require('./middlewares/authenticateToken');
+const protectedRoutes = require('./routes/protectedRoutes')
 
 require('dotenv').config();
 
@@ -14,17 +18,22 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: '*',
     methods: ['GET', 'POST', 'OPTIONS'],
     credentials: true,
 }));
 
 app.use(express.json());
-app.use(bodyParser.json());
+
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/students', studentRoutes); 
+app.use('/api/grades', gradesRoutes);
+app.use('/api/categories', categoriesRoutes);
+app.use('/api/periodos',periodosRoutes );
+app.use('/api/protected', authenticateToken, protectedRoutes);
+
 
 app.get('/api/secure-data', authenticateToken, (req, res) => {
     res.json({ message: 'Datos protegidos', user: req.user });
