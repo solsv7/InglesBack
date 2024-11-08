@@ -58,8 +58,10 @@ const login = async (req, res) => {
             token,
             user: {
                 id: usuarioEncontrado.id_usuario,
-                nombre: usuarioEncontrado.nombre, 
-                rol: usuarioEncontrado.id_rol
+                nombre: usuarioEncontrado.nombre_usuario,
+                rol: usuarioEncontrado.id_rol,
+                id_alumno: usuarioEncontrado.id_alumno, // id del estudiante
+                id_profesor: usuarioEncontrado.id_profesor,
             },
         });
     } catch (error) {
