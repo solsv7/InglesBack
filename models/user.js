@@ -2,7 +2,7 @@
 const { Model, DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 const Student = require('./Student'); // Importa el modelo Student
-const Teacher = require('./Teacher'); // Importa el modelo Teacher
+const Profesor = require('./Teacher'); // Importa el modelo Teacher
 
 class User extends Model {}
 

@@ -3,13 +3,12 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/users');
-const studentRoutes = require('./routes/studentsRoutes'); 
 const gradesRoutes = require('./routes/Grades');
 const categoriesRoutes = require ('./routes/categoriesRoutes');
 const periodosRoutes = require('./routes/periodosRoutes');
 const authenticateToken = require('./middlewares/authenticateToken');
-const protectedRoutes = require('./routes/protectedRoutes')
-
+const protectedRoutes = require('./routes/protectedRoutes');
+const crearPersonaYUsuario = require('./routes/crearpersonaRoutes');
 require('dotenv').config();
 
 const sequelize = require('./config/database');
@@ -28,11 +27,11 @@ app.use(express.json());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
-app.use('/api/students', studentRoutes); 
 app.use('/api/grades', gradesRoutes);
 app.use('/api/categories', categoriesRoutes);
 app.use('/api/periodos',periodosRoutes );
 app.use('/api/protected', authenticateToken, protectedRoutes);
+app.use('/api/crear-persona-usuario', crearPersonaYUsuario);
 
 
 app.get('/api/secure-data', authenticateToken, (req, res) => {

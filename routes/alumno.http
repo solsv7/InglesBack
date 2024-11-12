@@ -1,0 +1,10 @@
+POST http://localhost:3001/api/crear-persona-usuario
+Content-Type: application/json
+
+{
+    "dni": 45324575,
+    "nombre": "Barbara",
+    "rol": 3,
+    "password": "1234567",
+    "id_clase": null
+}
