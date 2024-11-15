@@ -1,0 +1,9 @@
+POST http://localhost:3001/api/grades/subir
+Content-Type: application/json
+
+{
+    "idAlumno": 24,
+    "idPeriodo": 1,
+    "idTipoNota": 1,
+    "nota": 9
+}

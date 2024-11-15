@@ -9,6 +9,7 @@ const periodosRoutes = require('./routes/periodosRoutes');
 const authenticateToken = require('./middlewares/authenticateToken');
 const protectedRoutes = require('./routes/protectedRoutes');
 const crearPersonaYUsuario = require('./routes/crearpersonaRoutes');
+const BuscarAlumnos = require('./routes/BuscarAlumRoute');
 require('dotenv').config();
 
 const sequelize = require('./config/database');
@@ -32,6 +33,7 @@ app.use('/api/categories', categoriesRoutes);
 app.use('/api/periodos',periodosRoutes );
 app.use('/api/protected', authenticateToken, protectedRoutes);
 app.use('/api/crear-persona-usuario', crearPersonaYUsuario);
+app.use('/api/obtenerAlumnos', BuscarAlumnos);
 
 
 app.get('/api/secure-data', authenticateToken, (req, res) => {
