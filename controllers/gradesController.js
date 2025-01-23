@@ -1,17 +1,22 @@
 const sequelize = require('../config/database'); 
 
 async function subirNota(req, res) {
-    const { idAlumno, idPeriodo, idTipoNota, nota } = req.body;
+    const { idAlumno, idPeriodo, idTipoNota, nota, cicloLectivo } = req.body;
 
     try {
         await sequelize.query(
-            'CALL SubirNota(?, ?, ?, ?)', 
+            'CALL SubirNota(:idAlumno, :idPeriodo, :idTipoNota, :nota, :cicloLectivo)', 
             {
-                replacements: [idAlumno, idPeriodo, idTipoNota, nota], 
-                type: sequelize.QueryTypes.RAW 
+            replacements: {
+                idAlumno,
+                idPeriodo,
+                idTipoNota,
+                nota,
+                cicloLectivo
+            },
+            type: sequelize.QueryTypes.RAW
             }
         );
-
 
         res.status(200).json({ message: 'Nota subida correctamente' });
     } catch (error) {
@@ -20,19 +25,14 @@ async function subirNota(req, res) {
     }
 }
 async function obtenerNotas(req, res) {
-    const { idAlumno } = req.params;  
+    const { idAlumno, cicloLectivo } = req.params;  
 
     try {
 
         const result = await sequelize.query(
-            `CALL ObtenerNotas(${idAlumno})`, 
-/*             {
-                replacements: [idAlumno],
-                type: sequelize.QueryTypes.SELECT 
-            } */
+            `CALL ObtenerNotas(${idAlumno}, ${cicloLectivo})`, 
         );
 
-        // Devolver las notas obtenidas
         res.status(200).json(result);
     } catch (error) {
         console.error('Error al obtener las notas:', error);
@@ -40,10 +40,29 @@ async function obtenerNotas(req, res) {
     }
 }
 
+async function actualizarNota(req, res) {
+    const { idAlumno, idPeriodo, idTipoNota, nota, cicloLectivo } = req.body;
+
+    try {
+        await sequelize.query(
+            'CALL actualizarNota(?, ?, ?, ?, ?)', 
+            {
+                replacements: [idAlumno, idPeriodo, idTipoNota, nota, cicloLectivo],
+                type: sequelize.QueryTypes.RAW
+            }
+        );
+
+        res.status(200).json({ message: 'Nota actualizada correctamente' });
+    } catch (error) {
+        console.error('Error al actualizar la nota:', error);
+        res.status(500).json({ error: 'Error al actualizar la nota' });
+    }
+}
 
 
 module.exports = {
     subirNota,
     obtenerNotas,
+    actualizarNota
 
 };
