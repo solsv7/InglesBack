@@ -1,29 +1,35 @@
 const sequelize = require('../config/database'); 
 
 async function subirNota(req, res) {
-    const { idAlumno, idPeriodo, idTipoNota, nota, cicloLectivo } = req.body;
+    const { notas } = req.body; // Esperamos un arreglo de notas
 
     try {
-        await sequelize.query(
-            'CALL SubirNota(:idAlumno, :idPeriodo, :idTipoNota, :nota, :cicloLectivo)', 
-            {
-            replacements: {
-                idAlumno,
-                idPeriodo,
-                idTipoNota,
-                nota,
-                cicloLectivo
-            },
-            type: sequelize.QueryTypes.RAW
-            }
-        );
+        for (const nota of notas) {
+            const { idAlumno, idPeriodo, idTipoNota, nota: valorNota, cicloLectivo } = nota;
 
-        res.status(200).json({ message: 'Nota subida correctamente' });
+            await sequelize.query(
+                'CALL SubirNota(:idAlumno, :idPeriodo, :idTipoNota, :nota, :cicloLectivo)', 
+                {
+                    replacements: {
+                        idAlumno,
+                        idPeriodo,
+                        idTipoNota,
+                        nota: valorNota,
+                        cicloLectivo
+                    },
+                    type: sequelize.QueryTypes.RAW
+                }
+            );
+        }
+
+        res.status(200).json({ message: 'Notas procesadas correctamente.' });
     } catch (error) {
-        console.error('Error al subir la nota:', error);
-        res.status(500).json({ error: 'Error al subir la nota' });
+        console.error('Error al subir las notas:', error);
+        res.status(500).json({ error: 'Error al subir las notas.' });
     }
 }
+
+
 async function obtenerNotas(req, res) {
     const { idAlumno, cicloLectivo } = req.params;  
 
