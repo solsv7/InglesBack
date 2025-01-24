@@ -92,6 +92,4 @@ module.exports = {
     subirNota,
     obtenerNotas,
     actualizarNota
-    actualizarNota
-
 };
