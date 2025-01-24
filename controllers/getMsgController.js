@@ -2,15 +2,15 @@ const sequelize = require('../config/database');
 
 async function obtenerMensajes(req, res) {
     // Obtener parámetros desde req.query para solicitudes GET
-    const { id_alumno } = req.query;
+    const { id_alumno, validation } = req.query;
 
-    console.log('Parámetros recibidos en la base de datos:', { id_alumno});
+    console.log('Parámetros recibidos en la base de datos:', { id_alumno, validation});
 
     try {
         const mensajes = await sequelize.query(
-            'CALL obtenerMensajes(?)',
+            'CALL obtenerMensajes(?,?)',
             {
-                replacements: [id_alumno ],
+                replacements: [id_alumno, validation ],
                 type: sequelize.QueryTypes.RAW,
             }
         );

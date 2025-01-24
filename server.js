@@ -10,11 +10,18 @@ const periodosRoutes = require('./routes/periodosRoutes');
 const authenticateToken = require('./middlewares/authenticateToken');
 const protectedRoutes = require('./routes/protectedRoutes');
 const crearPersonaYUsuario = require('./routes/crearpersonaRoutes');
+const crearAlumnoExcel = require('./routes/crearAlumnoExcelRoutes');
+const crearProfesor = require('./routes/crearProfesorRoutes');
 const BuscarAlumnos = require('./routes/BuscarAlumRoute');
 const Mensajes = require('./routes/messagesRoutes');
 const MensajeCurso = require('./routes/messagesCourseRoutes');
 const mensajesRoutes = require('./routes/getMsgRoutes'); // O el nombre correcto del archivo de rutas
 const subirFormulario = require('./routes/formRoutes');
+const exportToExcel = require('./routes/excelRoutes');
+const subirVideo = require('./routes/uploadVidsRoutes');
+const obtenerVideos = require('./routes/obtVidsRoutes');
+const obtenerInfoPerfil = require('./routes/infoPerfilRoutes');
+const actualizarPerfil = require('./routes/infoPerfilRoutes');
 
 require('dotenv').config();
 
@@ -25,7 +32,7 @@ const PORT = process.env.PORT || 3001;
 
 app.use(cors({
     origin: '*',
-    methods: ['GET', 'POST', 'OPTIONS'],
+    methods: ['GET', 'POST', 'OPTIONS','PUT'],
     credentials: true,
 }));
 
@@ -39,12 +46,19 @@ app.use('/api/categories', categoriesRoutes);
 app.use('/api/periodos',periodosRoutes );
 app.use('/api/protected', authenticateToken, protectedRoutes);
 app.use('/api/crear-persona-usuario', crearPersonaYUsuario);
+app.use('/api/crear-alumno-nuevo', crearAlumnoExcel);
+app.use('/api/crear-profesor-nuevo', crearProfesor);
 app.use('/api/obtenerAlumnos', BuscarAlumnos);
 app.use('/api/niveles', nivelesRoutes);
 app.use('/api/mensaje', Mensajes);
 app.use('/api/mensajeCurso', MensajeCurso);
 app.use('/api/getMsg', mensajesRoutes);
 app.use('/api/upload-form', subirFormulario);
+app.use('/api/export-excel', exportToExcel);
+app.use('/api/upload-vids', subirVideo);
+app.use('/api/all-vids', obtenerVideos);
+app.use('/api/perf-info', obtenerInfoPerfil);
+app.use('/api/actualizar-perfil', obtenerInfoPerfil);
  
 
 

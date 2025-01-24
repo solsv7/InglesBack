@@ -50,7 +50,7 @@ const login = async (req, res) => {
         const token = jwt.sign(
             { id: usuarioEncontrado.id_usuario, role: usuarioEncontrado.id_rol },
             process.env.JWT_SECRET,
-            { expiresIn: '1h' }
+            { expiresIn: '10s' }
         );
 
         // Responder con el token y datos del usuario
@@ -73,16 +73,38 @@ const login = async (req, res) => {
 
 
 const registerUser = async (req, res) => {
-    const { dni, password, role, userType } = req.body;
+    const { dni, password, nombre } = req.body;
 
     try {
-        const existingUsers = await pool.query(`CALL obtenerUsuarioPorDNI(${dni})`);
-        
+        // Verificar si el usuario ya existe
+        const [existingUsers] = await pool.query('CALL obtenerUsuarioPorDNI(?)', {
+            replacements: [dni],
+            type: QueryTypes.RAW,
+        });
+
+        if (existingUsers && existingUsers.length > 0) {
+            return res.status(400).json({ message: 'El usuario ya existe.' });
+        }
+
+        // Hashear la contraseña
         const hashedPassword = await bcrypt.hash(password, 10);
-        await pool.query(`CALL registrarUsuario(${dni},${hashedPassword},${role},${userType})`);
+
+        // Llamar al procedimiento almacenado para registrar al usuario
+        await pool.query(
+            'CALL registrarUsuario(:dni, :hashedPassword, :nombre);',
+            {
+                replacements: {
+                    dni,
+                    hashedPassword,
+                    nombre,
+                },
+                type: QueryTypes.RAW,
+            }
+        );
+
         return res.status(201).json({ message: 'Usuario creado' });
     } catch (error) {
-        console.error(error);
+        console.error('Error al registrar usuario:', error);
         return res.status(500).json({ message: 'Error al registrar usuario', error: error.message });
     }
 };
@@ -107,11 +129,11 @@ const actualizarContrasenia = async (req, res) => {
 };
 
 const validarRegistro = async (req, res) => {
-    const { dni, password, role } = req.body;
+    const { dni, password, nombre } = req.body;
 
     // Validaciones básicas
-    if (!dni || !password || !role) {
-        return res.status(400).json({ message: 'DNI, contraseña y rol son obligatorios.' });
+    if (!dni || !password || !nombre) {
+        return res.status(400).json({ message: 'DNI, contraseña y nombre son obligatorios.' });
     }
 
     // Validar que el DNI es un número entero
@@ -124,10 +146,6 @@ const validarRegistro = async (req, res) => {
         return res.status(400).json({ message: 'La contraseña debe tener al menos 6 caracteres.' });
     }
 
-    // Validar que el rol sea "student" o "teacher"
-    if (!['student', 'teacher'].includes(role)) {
-        return res.status(400).json({ message: 'El rol debe ser "student" o "teacher".' });
-    }
 
     return true; // Si todas las validaciones pasan
 };

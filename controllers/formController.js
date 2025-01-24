@@ -2,8 +2,8 @@ const sequelize = require('../config/database');
 
 async function subirFormulario(req, res) {
     const { 
-        programa, conoce_por, nombre, apellido, fecha_nacimiento, whatsapp,
-        nombre_adulto, apellido_adulto, whatsapp_adulto, calle, barrio, ciudad,
+        programa, conoce_por, nombre, dni, fecha_nacimiento, whatsapp,
+        nombre_adulto, whatsapp_adulto, calle, barrio, ciudad,
         estado_provincia, codigo_postal, mail, ocupacion, horarios_disponibles,
         nivel_estudio, pago, afeccion
     } = req.body;
@@ -12,11 +12,11 @@ async function subirFormulario(req, res) {
 
     try {
         await sequelize.query(
-            'CALL subirFormulario(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
+            'CALL subirFormulario(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)',
             {
                 replacements: [
-                    programa, conoce_por, nombre, apellido, fecha_nacimiento, whatsapp,
-                    nombre_adulto, apellido_adulto, whatsapp_adulto, calle, barrio, ciudad,
+                    programa, conoce_por, nombre, dni, fecha_nacimiento, whatsapp,
+                    nombre_adulto, whatsapp_adulto, calle, barrio, ciudad,
                     estado_provincia, codigo_postal, mail, ocupacion, horarios_disponibles,
                     nivel_estudio, pago, afeccion
                 ],
@@ -24,8 +24,8 @@ async function subirFormulario(req, res) {
             }
         );
         console.log("Datos enviados al procedimiento:", {
-            programa, conoce_por, nombre, apellido, fecha_nacimiento, whatsapp,
-            nombre_adulto, apellido_adulto, whatsapp_adulto, calle, barrio, ciudad,
+            programa, conoce_por, nombre, dni, fecha_nacimiento, whatsapp,
+            nombre_adulto, whatsapp_adulto, calle, barrio, ciudad,
             estado_provincia, codigo_postal, mail, ocupacion, horarios_disponibles,
             nivel_estudio, pago, afeccion
         });
