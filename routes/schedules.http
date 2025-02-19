@@ -1,0 +1,9 @@
+POST http://localhost:3001/api/clases
+Content-Type: application/json
+
+{
+  "id_nivel": 1,
+  "id_dia": 1,
+  "hora_inicio": "15:00:00",
+  "hora_fin": "16:00:00"
+}

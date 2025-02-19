@@ -2,7 +2,6 @@ const sequelize = require('../config/database');
 
 async function subirNota(req, res) {
     const { notas } = req.body; // Esperamos un arreglo de notas
-    const { notas } = req.body; // Esperamos un arreglo de notas
 
     try {
         for (const nota of notas) {
