@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const subirMensajeAlumno = require('../controllers/messagesController'); // Importa la función directamente
+const enviarMensaje = require('../controllers/messagesController'); // Importa la nueva función
 
-router.post('/', subirMensajeAlumno); // Asocia la función como manejador del POST
+router.post('/', enviarMensaje); // Asigna la función corregida
 
 module.exports = router;

@@ -31,7 +31,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors({
-    origin: '*',
+    origin: true,
     methods: ['GET', 'POST', 'OPTIONS','PUT'],
     credentials: true,
 }));
@@ -69,9 +69,11 @@ app.get('/api/secure-data', authenticateToken, (req, res) => {
 sequelize.sync()
     .then(() => {
         console.log('Base de datos sincronizada');
-        app.listen(PORT,'0.0.0.0', () => {
-            console.log(`Servidor corriendo en el puerto ${PORT}`);
+        app.listen(PORT, 3000, 3001, "192.168.1.113","192.168.0.113", () => {
+            console.log("Servidor corriendo");
         });
+        
+        
     })
     .catch(err => {
         console.error('Error al sincronizar la base de datos:', err);
