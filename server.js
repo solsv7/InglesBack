@@ -22,6 +22,8 @@ const subirVideo = require('./routes/uploadVidsRoutes');
 const obtenerVideos = require('./routes/obtVidsRoutes');
 const obtenerInfoPerfil = require('./routes/infoPerfilRoutes');
 const actualizarPerfil = require('./routes/infoPerfilRoutes');
+const horariosRoutes = require('./routes/horariosRoutes');
+const clasesRoutes = require('./routes/clasesRoutes');
 
 require('dotenv').config();
 
@@ -59,7 +61,8 @@ app.use('/api/upload-vids', subirVideo);
 app.use('/api/all-vids', obtenerVideos);
 app.use('/api/perf-info', obtenerInfoPerfil);
 app.use('/api/actualizar-perfil', obtenerInfoPerfil);
- 
+app.use('/api/horarios', horariosRoutes);
+app.use('/api/clases', clasesRoutes);
 
 
 app.get('/api/secure-data', authenticateToken, (req, res) => {
