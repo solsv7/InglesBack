@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const exportToExcel = require('../controllers/excelUtils'); // Importa la función del controlador
+const excelUtils = require('../controllers/excelUtils'); // Importa la función del controlador
 
-// Define la ruta para exportar a Excel
-router.post('/', exportToExcel);
+
+router.post('/export-excel', excelUtils.exportToExcel);
+router.post('/mailIngresoUsuario', excelUtils.enviarCorreoDecision);
 
 module.exports = router;

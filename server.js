@@ -17,13 +17,16 @@ const Mensajes = require('./routes/messagesRoutes');
 const MensajeCurso = require('./routes/messagesCourseRoutes');
 const mensajesRoutes = require('./routes/getMsgRoutes'); // O el nombre correcto del archivo de rutas
 const subirFormulario = require('./routes/formRoutes');
-const exportToExcel = require('./routes/excelRoutes');
+const exportToExcel= require('./routes/excelRoutes');
+const enviarCorreoDecision = require('./routes/excelRoutes');
 const subirVideo = require('./routes/uploadVidsRoutes');
 const obtenerVideos = require('./routes/obtVidsRoutes');
 const obtenerInfoPerfil = require('./routes/infoPerfilRoutes');
 const actualizarPerfil = require('./routes/infoPerfilRoutes');
 const horariosRoutes = require('./routes/horariosRoutes');
 const clasesRoutes = require('./routes/clasesRoutes');
+const acceptFormRoutes = require('./routes/acceptFormRoutes');
+const formRoutes = require('./routes/formRoutes'); 
 
 require('dotenv').config();
 
@@ -34,7 +37,7 @@ const PORT = process.env.PORT || 3001;
 
 app.use(cors({
     origin: true,
-    methods: ['GET', 'POST', 'OPTIONS','PUT'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
 }));
 
@@ -57,12 +60,15 @@ app.use('/api/mensajeCurso', MensajeCurso);
 app.use('/api/getMsg', mensajesRoutes);
 app.use('/api/upload-form', subirFormulario);
 app.use('/api/export-excel', exportToExcel);
+app.use('/api/mailIngresoUsuario', enviarCorreoDecision);
 app.use('/api/upload-vids', subirVideo);
 app.use('/api/all-vids', obtenerVideos);
 app.use('/api/perf-info', obtenerInfoPerfil);
 app.use('/api/actualizar-perfil', obtenerInfoPerfil);
 app.use('/api/horarios', horariosRoutes);
 app.use('/api/clases', clasesRoutes);
+app.use('/api/aceptarUsuario', acceptFormRoutes);
+app.use('/api/obtenerFormularios', formRoutes);
 
 
 app.get('/api/secure-data', authenticateToken, (req, res) => {

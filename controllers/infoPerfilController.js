@@ -1,17 +1,15 @@
 const sequelize = require('../config/database');
 
 async function obtenerInfoPerfil(req, res) {
-    // Obtener parámetros desde req.query para solicitudes GET
-    const id_alumno = req.query.id_alumno || null;
-    const id_profesor = req.query.id_profesor || null;
+    const { id_rol, id } = req.query; // Parámetros desde la petición
 
-    console.log('Parámetros recibidos en la base de datos:', { id_alumno, id_profesor });
+    console.log('Parámetros recibidos en el backend:', { id_rol, id });
 
     try {
         const content = await sequelize.query(
-            'CALL obtenerInfoPerfil(:id_alumno, :id_profesor)',
+            'CALL obtenerInfoPerfil(:id_rol, :id)',
             {
-                replacements: { id_alumno, id_profesor },
+                replacements: { id_rol, id },
                 type: sequelize.QueryTypes.RAW,
             }
         );
@@ -22,23 +20,28 @@ async function obtenerInfoPerfil(req, res) {
         res.status(500).json({ error: 'Error al obtener el perfil' });
     }
 }
+
 async function actualizarPerfil(req, res) {
     try {
-        // 📌 Obtener datos correctamente desde req.body
-        const { id_alumno, id_profesor, whatsapp, whatsapp_adulto, mail, id_foto, id_perfil } = req.body;
+        const { id, whatsapp, whatsapp_adulto, mail, id_foto, id_perfil } = req.body;
 
-        console.log('Parámetros recibidos en la base de datos para actualizar:', { 
-            id_alumno, id_profesor, whatsapp, whatsapp_adulto, mail, id_foto, id_perfil 
-        });
+        console.log('Parámetros para actualizar perfil:', { id, whatsapp, whatsapp_adulto, mail, id_foto, id_perfil });
 
-        // 📌 Ejecutar procedimiento almacenado con los datos
         const content = await sequelize.query(
-            'CALL actualizarPerfil(:id_alumno, :id_profesor, :whatsapp, :whatsapp_adulto, :mail, :id_foto, :id_perfil)',
+            'CALL actualizarPerfil(:id, :whatsapp, :whatsapp_adulto, :mail, :id_foto, :id_perfil)',
             {
-                replacements: { id_alumno, id_profesor, whatsapp, whatsapp_adulto, mail, id_foto, id_perfil },
+                replacements: { 
+                    id, 
+                    whatsapp, 
+                    whatsapp_adulto, 
+                    mail, 
+                    id_foto, 
+                    id_perfil 
+                },
                 type: sequelize.QueryTypes.RAW,
             }
         );
+            
 
         res.status(200).json({ message: "Perfil actualizado exitosamente", content });
     } catch (error) {
@@ -47,5 +50,4 @@ async function actualizarPerfil(req, res) {
     }
 }
 
-
-module.exports = {obtenerInfoPerfil, actualizarPerfil};
+module.exports = { obtenerInfoPerfil, actualizarPerfil };

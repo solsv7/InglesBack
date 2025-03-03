@@ -1,7 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const subirFormulario = require('../controllers/formController');
+const { subirFormulario, obtenerFormularios } = require('../controllers/formController');
 
-router.post('/', subirFormulario); // Asocia la función como manejador del POST
+
+router.post('/', subirFormulario);
+
+
+router.get('/:id_usuario', obtenerFormularios);
 
 module.exports = router;
