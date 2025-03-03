@@ -62,53 +62,58 @@ async function exportToExcel(req, res) {
     }
 }
 
-async function enviarCorreoDecision(req, res) {
-    const { opcion, email } = req.body;
-
-    if (!email || !opcion) {
-        return res.status(400).json({ error: "Faltan parámetros requeridos" });
-    }
-
-    let asunto, mensajeHTML;
-
-    if (opcion === "aceptar") {
-        asunto = "🎉 ¡Felicidades! Has sido aceptado";
-        mensajeHTML = `
-            <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; border: 1px solid #ddd;">
-                <h2 style="color: #4CAF50;">🎉 ¡Bienvenido al Campus!</h2>
-                <p>Nos alegra informarte que has sido <strong>aceptado</strong> en nuestra comunidad.</p>
-                <p>Puedes acceder a nuestra plataforma con tus credenciales.</p>
-                <p>Si tienes dudas, contáctanos.</p>
-                <p>Att. St.Thomas</p>
-            </div>
-        `;
-    } else {
-        asunto = "📢 Información sobre tu solicitud";
-        mensajeHTML = `
-            <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; border: 1px solid #ddd;">
-                <h2 style="color: #FF0000;">Lamentamos informarte</h2>
-                <p>Después de revisar tu solicitud, hemos decidido no aceptarte en esta ocasión.</p>
-                <p>Esperamos verte en futuras oportunidades.</p>
-                <p>Gracias por tu interés en nuestro campus.</p>
-                <p>Att. St.Thomas</p>
-            </div>
-        `;
-    }
-
-    const mailOptions = {
-        from: process.env.EMAIL_USER,
-        to: email, 
-        subject: asunto,
-        html: mensajeHTML, 
-    };
-
+const enviarCorreoDecision = async (req, res) => {
     try {
+        console.log("📩 Recibiendo solicitud de envío de correo:", req.body); 
+        const { opcion, email } = req.body;
+    
+        if (!email || !opcion) {
+            return res.status(400).json({ error: "Faltan parámetros requeridos" });
+        }
+    
+        let asunto, mensajeHTML;
+    
+        if (opcion === "aceptar") {
+            asunto = "🎉 ¡Felicidades! Has sido aceptado";
+            mensajeHTML = `
+                <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+                    <h2 style="color: #4CAF50;">🎉 ¡Bienvenido al Campus!</h2>
+                    <p>Nos alegra informarte que has sido <strong>aceptado</strong> en nuestra comunidad.</p>
+                    <p>Puedes acceder a nuestra plataforma con tus credenciales.</p>
+                    <p>Si tienes dudas, contáctanos.</p>
+                    <p style="margin-top: 20px;"><strong>Att. St.Thomas</strong></p>
+                </div>
+            `;
+        } else {
+            asunto = "📢 Información sobre tu solicitud";
+            mensajeHTML = `
+                <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
+                    <h2 style="color: #FF0000;">Lamentamos informarte</h2>
+                    <p>Después de revisar tu solicitud, hemos decidido no aceptarte en esta ocasión.</p>
+                    <p>Esperamos verte en futuras oportunidades.</p>
+                    <p>Gracias por tu interés en nuestro campus.</p>
+                    <p style="margin-top: 20px;"><strong>Att. St.Thomas</strong></p>
+                </div>
+            `;
+        }
+    
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email, 
+            subject: asunto,
+            html: mensajeHTML, 
+        };
+    
+        // Enviar el correo
         await transporter.sendMail(mailOptions);
-        res.status(200).json({ message: "Correo enviado correctamente." });
+
+        console.log("✅ Correo enviado con éxito.");
+        res.json({ message: "Correo enviado exitosamente" });
+
     } catch (error) {
-        console.error("Error enviando el correo:", error);
-        res.status(500).json({ error: `Error al enviar el correo: ${error.message}` });
+        console.error("❌ Error al enviar el correo:", error);
+        res.status(500).json({ error: "Error al enviar el correo" });
     }
-}
+};
 
 module.exports = { exportToExcel, enviarCorreoDecision };
