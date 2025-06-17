@@ -5,5 +5,5 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, proces
     host: process.env.DB_HOST,
     dialect: 'mariadb',
 });
-console.log('JWT_SECRET:', process.env.JWT_SECRET); // Para depuración
+console.log('JWT_SECRET:', process.env.JWT_SECRET); 
 module.exports = sequelize;
