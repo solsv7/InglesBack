@@ -39,3 +39,6 @@ Content-Type: application/json
 ### Obtener alumnos inscriptos a una clase
 GET http://localhost:3001/api/clases-alumnos/por-clase/2
 Content-Type: application/json
+
+### Obtener clases por fecha
+GET http://localhost:3001/api/clases-alumnos/clases-por-fecha?fecha=2025-06-18

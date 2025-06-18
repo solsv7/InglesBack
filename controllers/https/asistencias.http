@@ -1,0 +1,27 @@
+### Registrar asistencias (POST)
+POST http://localhost:3001/api/asistencia/registrar
+Content-Type: application/json
+
+{
+  "id_clase": 3,
+  "fecha": "2025-06-11",
+  "asistencias": [
+    { "id_alumno": 2, "presente": 1 },
+    { "id_alumno": 24, "presente": 1 },
+    { "id_alumno": 29, "presente": 1 },
+    { "id_alumno": 30, "presente": 0 }
+  ]
+}
+
+### Obtener asistencias por clase y fecha
+GET http://localhost:3001/api/asistencia/por-clase-fecha?id_clase=3&fecha=2025-06-18
+
+###
+
+### Obtener totales de asistencias e inasistencias por clase
+GET http://localhost:3001/api/asistencia/totales/3
+
+###
+
+### Obtener totales por clase y rango de fechas
+GET http://localhost:3001/api/asistencia/totales-rango?id_clase=3&fecha_inicio=2025-06-01&fecha_fin=2025-06-30

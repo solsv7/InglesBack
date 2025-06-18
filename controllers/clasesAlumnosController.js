@@ -61,6 +61,24 @@ const obtenerAlumnosPorClase = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener alumnos por clase' });
   }
 };
+const obtenerClasesPorFecha = async (req, res) => {
+  const { fecha } = req.query;
+
+  if (!fecha) {
+    return res.status(400).json({ error: 'Debes proporcionar una fecha' });
+  }
+
+  try {
+    const clases = await sequelize.query('CALL ObtenerClasesPorFecha(:fecha)', {
+      replacements: { fecha },
+    });
+    res.status(200).json(clases);
+  } catch (error) {
+    console.error('Error al obtener clases por fecha:', error);
+    res.status(500).json({ error: 'Error al obtener clases por fecha' });
+  }
+};
+
 
 
 module.exports = {
@@ -68,5 +86,7 @@ module.exports = {
   inscribirAlumnoClase,
   actualizarInscripcion,
   eliminarInscripcion,
-  obtenerAlumnosPorClase
+  obtenerAlumnosPorClase,
+  obtenerClasesPorFecha
+
 };
