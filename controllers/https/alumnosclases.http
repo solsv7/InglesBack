@@ -1,0 +1,41 @@
+### Obtener inscripciones
+GET http://localhost:3001/api/clases-alumnos
+Content-Type: application/json
+
+###
+
+### Inscribir alumno en clase
+POST http://localhost:3001/api/clases-alumnos
+Content-Type: application/json
+
+{
+  "id_alumno": 2,
+  "id_clase": 1
+}
+
+###
+
+### Actualizar inscripción
+PUT http://localhost:3001/api/clases-alumnos
+Content-Type: application/json
+
+{
+  "id_alumno": 2,
+  "id_clase_actual": 1,
+  "id_clase_nueva": 3
+}
+
+###
+
+### Eliminar inscripción
+DELETE http://localhost:3001/api/clases-alumnos
+Content-Type: application/json
+
+{
+  "id_alumno": 2,
+  "id_clase": 3
+}
+
+### Obtener alumnos inscriptos a una clase
+GET http://localhost:3001/api/clases-alumnos/por-clase/2
+Content-Type: application/json

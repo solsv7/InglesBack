@@ -1,6 +1,0 @@
-PUT http://localhost:3000/niveles/actualizarnivel/8
-Content-Type: application/json
-
-{
-    "nombre": "Nivel Intermedio"
-}

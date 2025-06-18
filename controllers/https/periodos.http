@@ -1,0 +1,29 @@
+### Obtener todos los períodos
+GET http://localhost:3001/api/periodos
+Content-Type: application/json
+
+###
+
+### Crear nuevo período
+POST http://localhost:3001/api/periodos
+Content-Type: application/json
+
+{
+  "nombre": "Primer Trimestre"
+}
+
+###
+
+### Editar un período
+PUT http://localhost:3001/api/periodos/5
+Content-Type: application/json
+
+{
+  "nombre": "Trimestre 1"
+}
+
+###
+
+### Eliminar (baja lógica)
+DELETE http://localhost:3001/api/periodos/5
+Content-Type: application/json

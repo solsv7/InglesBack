@@ -1,0 +1,42 @@
+### Obtener todos los niveles
+GET http://localhost:3001/api/niveles
+
+
+### Agregar nivel A1 de Portugués
+POST http://localhost:3001/api/niveles
+Content-Type: application/json
+
+{
+  "nombre": "A1",
+  "idioma": "Portugués"
+}
+
+
+### Agregar nivel A2 de Portugués
+POST http://localhost:3001/api/niveles
+Content-Type: application/json
+
+{
+  "nombre": "A2",
+  "idioma": "Portugués"
+}
+
+
+### Editar nivel A2 a B1 (reemplazar :id_nivel con uno real)
+PUT http://localhost:3001/api/niveles/7
+Content-Type: application/json
+
+{
+  "nombre": "B1",
+  "idioma": "Portugués"
+}
+
+
+
+### Eliminar nivel con id 7
+POST http://localhost:3001/api/niveles/eliminar
+Content-Type: application/json
+
+{
+  "id_nivel": 7
+}

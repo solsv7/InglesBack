@@ -1,9 +1,0 @@
-POST http://localhost:3001/api/crear-persona-usuario
-Content-Type: application/json
-
-{
-    "dni": 41991329,
-    "nombre": "Lautaro Bustamente",
-    "rol": 2,
-    "password": "1234567"
-}
