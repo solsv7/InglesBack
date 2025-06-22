@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const subirMensajeCurso = require('../controllers/messagesCourseController'); // Importa la función directamente
+const { subirMensajeClase } = require('../controllers/messagesCourseController.js');
 
-router.post('/', subirMensajeCurso); // Asocia la función como manejador del POST
+// Ruta para enviar mensaje a alumnos de una clase
+router.post('/mensajeClase', subirMensajeClase);
 
 module.exports = router;

@@ -8,7 +8,6 @@ async function aceptarUsuario(req, res) {
     }
 
     try {
-        console.log("Ejecutando procedimiento almacenado...");
 
         await sequelize.query('SET @dirMail = NULL;', { type: sequelize.QueryTypes.RAW });
 
@@ -20,14 +19,12 @@ async function aceptarUsuario(req, res) {
             }
         );
 
-        console.log("Procedimiento ejecutado correctamente.");
 
         const emailResult = await sequelize.query(
             'SELECT @dirMail AS selectedEmail;',
             { type: sequelize.QueryTypes.SELECT }
         );
 
-        console.log("Resultado del correo:", emailResult);
 
         if (!emailResult || emailResult.length === 0) {
             throw new Error("No se pudo obtener el email.");

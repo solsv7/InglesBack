@@ -1,0 +1,30 @@
+### Crear una cuota
+POST http://localhost:3001/api/cuotas
+Content-Type: application/json
+
+{
+  "id_alumno": 24,
+  "id_plan": 2,
+  "fecha_inicio": "2025-06-01",
+  "fecha_vencimiento": "2025-06-30"
+}
+
+### Obtener todas las cuotas
+GET http://localhost:3001/api/cuotas
+
+### Obtener cuotas por alumno
+GET http://localhost:3001/api/cuotas/alumno/24
+
+### Obtener cuotas pendientes
+GET http://localhost:3001/api/cuotas/pendientes
+
+###
+PUT http://localhost:3001/api/cuotas/editar/8
+Content-Type: application/json
+
+{
+  "estado_pago": "paga"
+}
+
+### Obtener cuotas entre fechas
+GET http://localhost:3001/api/cuotas/rango?desde=2025-05-01&hasta=2025-07-31

@@ -61,9 +61,58 @@ const obtenerTotalesPorClaseYRango = async (req, res) => {
   }
 };
 
+const obtenerResumenAsistenciasAlumno = async (req, res) => {
+  const { id_alumno } = req.params;
+
+  try {
+    const datos = await sequelize.query('CALL ObtenerResumenAsistenciasAlumno(:id_alumno)', {
+      replacements: { id_alumno }
+    });
+    res.status(200).json(datos);
+  } catch (error) {
+    console.error('Error al obtener resumen de asistencias del alumno:', error);
+    res.status(500).json({ error: 'Error al obtener resumen' });
+  }
+};
+
+// 2. Asistencias en rango de fechas
+const obtenerAsistenciasPorRangoAlumno = async (req, res) => {
+  const { id_alumno, fecha_inicio, fecha_fin } = req.query;
+
+  try {
+    const datos = await sequelize.query(
+      'CALL ObtenerAsistenciasPorRangoAlumno(:id_alumno, :fecha_inicio, :fecha_fin)',
+      { replacements: { id_alumno, fecha_inicio, fecha_fin } }
+    );
+    res.status(200).json(datos);
+  } catch (error) {
+    console.error('Error al obtener asistencias por rango del alumno:', error);
+    res.status(500).json({ error: 'Error al obtener datos' });
+  }
+};
+
+// 3. Asistencia puntual en una fecha
+const obtenerAsistenciasPorFechaAlumno = async (req, res) => {
+  const { id_alumno, fecha } = req.query;
+
+  try {
+    const datos = await sequelize.query(
+      'CALL ObtenerAsistenciasPorFechaAlumno(:id_alumno, :fecha)',
+      { replacements: { id_alumno, fecha } }
+    );
+    res.status(200).json(datos);
+  } catch (error) {
+    console.error('Error al obtener asistencia por fecha del alumno:', error);
+    res.status(500).json({ error: 'Error al obtener datos' });
+  }
+};
+
 module.exports = {
   registrarAsistencias,
   obtenerAsistenciasPorClaseYFecha,
   obtenerTotalesAsistenciasPorClase,
-  obtenerTotalesPorClaseYRango
+  obtenerTotalesPorClaseYRango,
+  obtenerAsistenciasPorFechaAlumno,
+  obtenerAsistenciasPorRangoAlumno,
+  obtenerResumenAsistenciasAlumno
 };

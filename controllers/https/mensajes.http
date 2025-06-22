@@ -1,0 +1,8 @@
+### Enviar mensaje a una clase
+POST http://localhost:3001/api/mensajeCurso/mensajeClase
+Content-Type: application/json
+
+{
+  "id_clase": 3,
+  "mensaje": "Este es un aviso de prueba para todos los alumnos de la clase 3."
+}

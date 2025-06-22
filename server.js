@@ -28,6 +28,8 @@ const acceptFormRoutes = require('./routes/acceptFormRoutes');
 const formRoutes = require('./routes/formRoutes'); 
 const clasesAlumnoRoute = require('./routes/clasesAlumnosRoutes');
 const asistenciaRoutes = require('./routes/asistencia.js');
+const cuotasRoutes = require('./routes/cuotasRoutes.js');
+const planesRoutes = require('./routes/planesRoutes.js')
 
 require('dotenv').config();
 
@@ -72,6 +74,9 @@ app.use('/api/obtenerFormularios', formRoutes);
 app.use('/api/obtenerFormularios', formRoutes);
 app.use('/api/clases-alumnos', clasesAlumnoRoute);
 app.use('/api/asistencia', asistenciaRoutes);
+app.use('/api/planes', planesRoutes);
+app.use('/api/cuotas', cuotasRoutes);
+
 
 
 app.get('/api/secure-data', authenticateToken, (req, res) => {

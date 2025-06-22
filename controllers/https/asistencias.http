@@ -25,3 +25,19 @@ GET http://localhost:3001/api/asistencia/totales/3
 
 ### Obtener totales por clase y rango de fechas
 GET http://localhost:3001/api/asistencia/totales-rango?id_clase=3&fecha_inicio=2025-06-01&fecha_fin=2025-06-30
+
+### 1. Obtener resumen total de asistencias del alumno
+GET http://localhost:3001/api/asistencia/resumen/2
+Content-Type: application/json
+
+###
+
+### 2. Obtener asistencias por rango de fechas
+GET http://localhost:3001/api/asistencia/rango?id_alumno=2&fecha_inicio=2025-06-01&fecha_fin=2025-06-30
+Content-Type: application/json
+
+###
+
+### 3. Obtener asistencia puntual en una fecha
+GET http://localhost:3001/api/asistencia/fecha?id_alumno=2&fecha=2025-06-18
+Content-Type: application/json

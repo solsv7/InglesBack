@@ -1,0 +1,24 @@
+### Crear un plan
+POST http://localhost:3001/api/planes
+Content-Type: application/json
+
+{
+  "nombre": "Plan Mensual Avanzado",
+  "descripcion": "Pago mensual de clases avanzadas",
+  "monto": 35000
+}
+
+### Obtener todos los planes
+GET http://localhost:3001/api/planes
+
+### Editar plan
+PUT http://localhost:3001/api/planes/1
+Content-Type: application/json
+
+{
+  "nombre": "Plan Mensual Actualizado",
+  "descripcion": "Actualizado"
+}
+
+### Eliminar plan (soft delete)
+DELETE http://localhost:3001/api/planes/1
