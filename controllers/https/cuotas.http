@@ -28,3 +28,6 @@ Content-Type: application/json
 
 ### Obtener cuotas entre fechas
 GET http://localhost:3001/api/cuotas/rango?desde=2025-05-01&hasta=2025-07-31
+###
+
+GET http://localhost:3001/api/cuotas/vigentes?id_alumno=2&fecha=2025-06-20

@@ -11,5 +11,5 @@ router.put('/editar/:id_cuota', cuotasController.editarCuota);
 router.get('/rango', cuotasController.obtenerCuotasPorRango);
 router.delete('/eliminar/:id_cuota', cuotasController.eliminarCuota);
 router.get('/anio', cuotasController.obtenerCuotasPorAnio);
-
+router.get('/vigentes', cuotasController.verificarCuotasVigentes);
 module.exports = router;

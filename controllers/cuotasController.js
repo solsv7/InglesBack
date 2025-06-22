@@ -126,6 +126,22 @@ const obtenerCuotasPorAnio = async (req, res) => {
     res.status(500).json({ error: 'Error al obtener cuotas por año' });
   }
 };
+const verificarCuotasVigentes = async (req, res) => {
+  const { id_alumno, fecha } = req.query;
+  if (!id_alumno || !fecha) {
+    return res.status(400).json({ error: 'Debe proporcionar "I_alumno" y "fecha" en formato YYYY-MM-DD' });
+  }
+
+  try {
+    const results = await sequelize.query('CALL VerificarCuotasVigentes(:id_alumno, :fecha)', {
+      replacements: { id_alumno, fecha },
+    });
+    res.json(results);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error al obtener cuotas' });
+  }
+};
 
 
 module.exports = {
@@ -136,5 +152,7 @@ module.exports = {
   editarCuota,
   obtenerCuotasPorRango,
   eliminarCuota,
-  obtenerCuotasPorAnio
+  obtenerCuotasPorAnio,
+  verificarCuotasVigentes
+
 };
