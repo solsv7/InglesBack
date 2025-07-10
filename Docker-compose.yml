@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: admin123
+      MYSQL_DATABASE: instituto_ingles
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./instituto_ingles.sql:/docker-entrypoint-initdb.d/instituto_ingles.sql
+
+  backend:
+    build: ./
+    container_name: node_app
+    restart: always
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mysql
+    env_file:
+      - .env
