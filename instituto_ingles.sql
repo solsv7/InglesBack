@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Servidor: 127.0.0.1
--- Tiempo de generación: 23-06-2025 a las 00:43:48
--- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.2.12
+-- Host: 127.0.0.1
+-- Generation Time: Jul 23, 2025 at 09:57 PM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,12 +18,12 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Base de datos: `instituto_ingles`
+-- Database: `instituto_ingles`
 --
 
 DELIMITER $$
 --
--- Procedimientos
+-- Procedures
 --
 CREATE DEFINER=`root`@`localhost` PROCEDURE `ActualizarClase` (IN `p_id_clase` INT, IN `p_id_dia` INT, IN `p_id_nivel` INT, IN `p_hora_inicio` TIME, IN `p_hora_fin` TIME)   BEGIN
   UPDATE clases
@@ -890,7 +890,7 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `alumno`
+-- Table structure for table `alumno`
 --
 
 CREATE TABLE `alumno` (
@@ -901,7 +901,7 @@ CREATE TABLE `alumno` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `alumno`
+-- Dumping data for table `alumno`
 --
 
 INSERT INTO `alumno` (`id_alumno`, `dni_alumno`, `nombre`, `id_clase`) VALUES
@@ -919,7 +919,7 @@ INSERT INTO `alumno` (`id_alumno`, `dni_alumno`, `nombre`, `id_clase`) VALUES
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `asistencia`
+-- Table structure for table `asistencia`
 --
 
 CREATE TABLE `asistencia` (
@@ -932,7 +932,7 @@ CREATE TABLE `asistencia` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `clases`
+-- Table structure for table `clases`
 --
 
 CREATE TABLE `clases` (
@@ -946,7 +946,7 @@ CREATE TABLE `clases` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `clases`
+-- Dumping data for table `clases`
 --
 
 INSERT INTO `clases` (`id_clase`, `id_nivel`, `id_dia`, `hora_inicio`, `hora_fin`, `disponible`, `cupo_maximo`) VALUES
@@ -960,7 +960,7 @@ INSERT INTO `clases` (`id_clase`, `id_nivel`, `id_dia`, `hora_inicio`, `hora_fin
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `clases_alumnos`
+-- Table structure for table `clases_alumnos`
 --
 
 CREATE TABLE `clases_alumnos` (
@@ -969,7 +969,7 @@ CREATE TABLE `clases_alumnos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `clases_alumnos`
+-- Dumping data for table `clases_alumnos`
 --
 
 INSERT INTO `clases_alumnos` (`id_alumno`, `id_clase`) VALUES
@@ -988,7 +988,7 @@ INSERT INTO `clases_alumnos` (`id_alumno`, `id_clase`) VALUES
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `clases_usuarios`
+-- Table structure for table `clases_usuarios`
 --
 
 CREATE TABLE `clases_usuarios` (
@@ -999,7 +999,7 @@ CREATE TABLE `clases_usuarios` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `clases_usuarios`
+-- Dumping data for table `clases_usuarios`
 --
 
 INSERT INTO `clases_usuarios` (`id_alumno`, `id_clase`, `fecha`, `presente`) VALUES
@@ -1023,7 +1023,7 @@ INSERT INTO `clases_usuarios` (`id_alumno`, `id_clase`, `fecha`, `presente`) VAL
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `cuotas`
+-- Table structure for table `cuotas`
 --
 
 CREATE TABLE `cuotas` (
@@ -1036,7 +1036,7 @@ CREATE TABLE `cuotas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `cuotas`
+-- Dumping data for table `cuotas`
 --
 
 INSERT INTO `cuotas` (`id_cuota`, `id_alumno`, `id_plan`, `fecha_inicio`, `fecha_vencimiento`, `estado_pago`) VALUES
@@ -1046,7 +1046,7 @@ INSERT INTO `cuotas` (`id_cuota`, `id_alumno`, `id_plan`, `fecha_inicio`, `fecha
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `dias`
+-- Table structure for table `dias`
 --
 
 CREATE TABLE `dias` (
@@ -1055,7 +1055,7 @@ CREATE TABLE `dias` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `dias`
+-- Dumping data for table `dias`
 --
 
 INSERT INTO `dias` (`id_dia`, `nombre`) VALUES
@@ -1068,7 +1068,7 @@ INSERT INTO `dias` (`id_dia`, `nombre`) VALUES
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `formularios`
+-- Table structure for table `formularios`
 --
 
 CREATE TABLE `formularios` (
@@ -1096,7 +1096,7 @@ CREATE TABLE `formularios` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `formularios`
+-- Dumping data for table `formularios`
 --
 
 INSERT INTO `formularios` (`id_formulario`, `programa`, `conoce_por`, `nombre`, `dni`, `fecha_nacimiento`, `whatsapp`, `nombre_adulto`, `whatsapp_adulto`, `calle`, `barrio`, `ciudad`, `estado_provincia`, `codigo_postal`, `mail`, `ocupacion`, `horarios_disponibles`, `nivel_estudio`, `pago`, `afeccion`, `id_usuario`) VALUES
@@ -1138,7 +1138,7 @@ INSERT INTO `formularios` (`id_formulario`, `programa`, `conoce_por`, `nombre`, 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `mensajes`
+-- Table structure for table `mensajes`
 --
 
 CREATE TABLE `mensajes` (
@@ -1150,7 +1150,7 @@ CREATE TABLE `mensajes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `mensajes`
+-- Dumping data for table `mensajes`
 --
 
 INSERT INTO `mensajes` (`id_mensaje`, `id_alumno`, `mensaje`, `id_nivel`, `createdAt`) VALUES
@@ -1206,7 +1206,7 @@ INSERT INTO `mensajes` (`id_mensaje`, `id_alumno`, `mensaje`, `id_nivel`, `creat
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `niveles`
+-- Table structure for table `niveles`
 --
 
 CREATE TABLE `niveles` (
@@ -1217,7 +1217,7 @@ CREATE TABLE `niveles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `niveles`
+-- Dumping data for table `niveles`
 --
 
 INSERT INTO `niveles` (`id_nivel`, `nombre`, `activo`, `idioma`) VALUES
@@ -1234,7 +1234,7 @@ INSERT INTO `niveles` (`id_nivel`, `nombre`, `activo`, `idioma`) VALUES
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `notas`
+-- Table structure for table `notas`
 --
 
 CREATE TABLE `notas` (
@@ -1247,7 +1247,7 @@ CREATE TABLE `notas` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `notas`
+-- Dumping data for table `notas`
 --
 
 INSERT INTO `notas` (`id_nota`, `id_alumno`, `id_periodo`, `id_tipo_nota`, `nota`, `ciclo_lectivo`) VALUES
@@ -1500,7 +1500,7 @@ INSERT INTO `notas` (`id_nota`, `id_alumno`, `id_periodo`, `id_tipo_nota`, `nota
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `perfil`
+-- Table structure for table `perfil`
 --
 
 CREATE TABLE `perfil` (
@@ -1515,7 +1515,7 @@ CREATE TABLE `perfil` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `perfil`
+-- Dumping data for table `perfil`
 --
 
 INSERT INTO `perfil` (`id_perfil`, `nombre`, `whatsapp`, `whatsapp_adulto`, `mail`, `id_foto`, `id_alumno`, `id_profesor`) VALUES
@@ -1527,7 +1527,7 @@ INSERT INTO `perfil` (`id_perfil`, `nombre`, `whatsapp`, `whatsapp_adulto`, `mai
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `periodos`
+-- Table structure for table `periodos`
 --
 
 CREATE TABLE `periodos` (
@@ -1537,7 +1537,7 @@ CREATE TABLE `periodos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `periodos`
+-- Dumping data for table `periodos`
 --
 
 INSERT INTO `periodos` (`id_periodo`, `nombre`, `activo`) VALUES
@@ -1551,7 +1551,7 @@ INSERT INTO `periodos` (`id_periodo`, `nombre`, `activo`) VALUES
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `planes`
+-- Table structure for table `planes`
 --
 
 CREATE TABLE `planes` (
@@ -1563,7 +1563,7 @@ CREATE TABLE `planes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `planes`
+-- Dumping data for table `planes`
 --
 
 INSERT INTO `planes` (`id_plan`, `nombre`, `descripcion`, `monto`, `activa`) VALUES
@@ -1574,7 +1574,7 @@ INSERT INTO `planes` (`id_plan`, `nombre`, `descripcion`, `monto`, `activa`) VAL
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `profesor`
+-- Table structure for table `profesor`
 --
 
 CREATE TABLE `profesor` (
@@ -1587,7 +1587,7 @@ CREATE TABLE `profesor` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `profesor`
+-- Dumping data for table `profesor`
 --
 
 INSERT INTO `profesor` (`id_profesor`, `dni`, `nombre`, `userId`, `createdAt`, `updatedAt`) VALUES
@@ -1603,7 +1603,7 @@ INSERT INTO `profesor` (`id_profesor`, `dni`, `nombre`, `userId`, `createdAt`, `
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `roles`
+-- Table structure for table `roles`
 --
 
 CREATE TABLE `roles` (
@@ -1612,7 +1612,7 @@ CREATE TABLE `roles` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `roles`
+-- Dumping data for table `roles`
 --
 
 INSERT INTO `roles` (`id_rol`, `nombre`) VALUES
@@ -1624,7 +1624,7 @@ INSERT INTO `roles` (`id_rol`, `nombre`) VALUES
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `tipo_nota`
+-- Table structure for table `tipo_nota`
 --
 
 CREATE TABLE `tipo_nota` (
@@ -1633,7 +1633,7 @@ CREATE TABLE `tipo_nota` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `tipo_nota`
+-- Dumping data for table `tipo_nota`
 --
 
 INSERT INTO `tipo_nota` (`id_tipo`, `nombre`) VALUES
@@ -1646,7 +1646,7 @@ INSERT INTO `tipo_nota` (`id_tipo`, `nombre`) VALUES
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `usuario`
+-- Table structure for table `usuario`
 --
 
 CREATE TABLE `usuario` (
@@ -1658,7 +1658,7 @@ CREATE TABLE `usuario` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `usuario`
+-- Dumping data for table `usuario`
 --
 
 INSERT INTO `usuario` (`id_usuario`, `id_alumno`, `id_profesor`, `id_rol`, `password`) VALUES
@@ -1713,7 +1713,7 @@ INSERT INTO `usuario` (`id_usuario`, `id_alumno`, `id_profesor`, `id_rol`, `pass
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `videos`
+-- Table structure for table `videos`
 --
 
 CREATE TABLE `videos` (
@@ -1724,18 +1724,18 @@ CREATE TABLE `videos` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
--- Volcado de datos para la tabla `videos`
+-- Dumping data for table `videos`
 --
 
 INSERT INTO `videos` (`id_video`, `titulo`, `idioma`, `url`) VALUES
 (4, '505 - Artic Monkeys', 'Ingles', 'https://www.youtube.com/watch?v=qU9mHegkTc4');
 
 --
--- Índices para tablas volcadas
+-- Indexes for dumped tables
 --
 
 --
--- Indices de la tabla `alumno`
+-- Indexes for table `alumno`
 --
 ALTER TABLE `alumno`
   ADD PRIMARY KEY (`id_alumno`),
@@ -1743,14 +1743,14 @@ ALTER TABLE `alumno`
   ADD KEY `id_clase` (`id_clase`);
 
 --
--- Indices de la tabla `asistencia`
+-- Indexes for table `asistencia`
 --
 ALTER TABLE `asistencia`
   ADD PRIMARY KEY (`id_asistencia`),
   ADD KEY `id_alumno` (`id_alumno`);
 
 --
--- Indices de la tabla `clases`
+-- Indexes for table `clases`
 --
 ALTER TABLE `clases`
   ADD PRIMARY KEY (`id_clase`),
@@ -1758,21 +1758,21 @@ ALTER TABLE `clases`
   ADD KEY `id_dia` (`id_dia`);
 
 --
--- Indices de la tabla `clases_alumnos`
+-- Indexes for table `clases_alumnos`
 --
 ALTER TABLE `clases_alumnos`
   ADD PRIMARY KEY (`id_alumno`,`id_clase`),
   ADD KEY `id_clase` (`id_clase`);
 
 --
--- Indices de la tabla `clases_usuarios`
+-- Indexes for table `clases_usuarios`
 --
 ALTER TABLE `clases_usuarios`
   ADD PRIMARY KEY (`id_alumno`,`id_clase`,`fecha`),
   ADD KEY `id_clase` (`id_clase`);
 
 --
--- Indices de la tabla `cuotas`
+-- Indexes for table `cuotas`
 --
 ALTER TABLE `cuotas`
   ADD PRIMARY KEY (`id_cuota`),
@@ -1780,31 +1780,31 @@ ALTER TABLE `cuotas`
   ADD KEY `id_plan` (`id_plan`);
 
 --
--- Indices de la tabla `dias`
+-- Indexes for table `dias`
 --
 ALTER TABLE `dias`
   ADD PRIMARY KEY (`id_dia`);
 
 --
--- Indices de la tabla `formularios`
+-- Indexes for table `formularios`
 --
 ALTER TABLE `formularios`
   ADD PRIMARY KEY (`id_formulario`);
 
 --
--- Indices de la tabla `mensajes`
+-- Indexes for table `mensajes`
 --
 ALTER TABLE `mensajes`
   ADD PRIMARY KEY (`id_mensaje`);
 
 --
--- Indices de la tabla `niveles`
+-- Indexes for table `niveles`
 --
 ALTER TABLE `niveles`
   ADD PRIMARY KEY (`id_nivel`);
 
 --
--- Indices de la tabla `notas`
+-- Indexes for table `notas`
 --
 ALTER TABLE `notas`
   ADD PRIMARY KEY (`id_nota`),
@@ -1813,25 +1813,25 @@ ALTER TABLE `notas`
   ADD KEY `id_tipo_nota` (`id_tipo_nota`);
 
 --
--- Indices de la tabla `perfil`
+-- Indexes for table `perfil`
 --
 ALTER TABLE `perfil`
   ADD PRIMARY KEY (`id_perfil`);
 
 --
--- Indices de la tabla `periodos`
+-- Indexes for table `periodos`
 --
 ALTER TABLE `periodos`
   ADD PRIMARY KEY (`id_periodo`);
 
 --
--- Indices de la tabla `planes`
+-- Indexes for table `planes`
 --
 ALTER TABLE `planes`
   ADD PRIMARY KEY (`id_plan`);
 
 --
--- Indices de la tabla `profesor`
+-- Indexes for table `profesor`
 --
 ALTER TABLE `profesor`
   ADD PRIMARY KEY (`id_profesor`),
@@ -1839,19 +1839,19 @@ ALTER TABLE `profesor`
   ADD KEY `profesor_userId_foreign_idx` (`userId`);
 
 --
--- Indices de la tabla `roles`
+-- Indexes for table `roles`
 --
 ALTER TABLE `roles`
   ADD PRIMARY KEY (`id_rol`);
 
 --
--- Indices de la tabla `tipo_nota`
+-- Indexes for table `tipo_nota`
 --
 ALTER TABLE `tipo_nota`
   ADD PRIMARY KEY (`id_tipo`);
 
 --
--- Indices de la tabla `usuario`
+-- Indexes for table `usuario`
 --
 ALTER TABLE `usuario`
   ADD PRIMARY KEY (`id_usuario`),
@@ -1860,163 +1860,163 @@ ALTER TABLE `usuario`
   ADD KEY `id_rol` (`id_rol`);
 
 --
--- Indices de la tabla `videos`
+-- Indexes for table `videos`
 --
 ALTER TABLE `videos`
   ADD PRIMARY KEY (`id_video`);
 
 --
--- AUTO_INCREMENT de las tablas volcadas
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT de la tabla `alumno`
+-- AUTO_INCREMENT for table `alumno`
 --
 ALTER TABLE `alumno`
   MODIFY `id_alumno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
--- AUTO_INCREMENT de la tabla `asistencia`
+-- AUTO_INCREMENT for table `asistencia`
 --
 ALTER TABLE `asistencia`
   MODIFY `id_asistencia` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT de la tabla `clases`
+-- AUTO_INCREMENT for table `clases`
 --
 ALTER TABLE `clases`
   MODIFY `id_clase` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
--- AUTO_INCREMENT de la tabla `cuotas`
+-- AUTO_INCREMENT for table `cuotas`
 --
 ALTER TABLE `cuotas`
   MODIFY `id_cuota` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
--- AUTO_INCREMENT de la tabla `dias`
+-- AUTO_INCREMENT for table `dias`
 --
 ALTER TABLE `dias`
   MODIFY `id_dia` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
--- AUTO_INCREMENT de la tabla `formularios`
+-- AUTO_INCREMENT for table `formularios`
 --
 ALTER TABLE `formularios`
   MODIFY `id_formulario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
 
 --
--- AUTO_INCREMENT de la tabla `mensajes`
+-- AUTO_INCREMENT for table `mensajes`
 --
 ALTER TABLE `mensajes`
   MODIFY `id_mensaje` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 
 --
--- AUTO_INCREMENT de la tabla `niveles`
+-- AUTO_INCREMENT for table `niveles`
 --
 ALTER TABLE `niveles`
   MODIFY `id_nivel` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
--- AUTO_INCREMENT de la tabla `notas`
+-- AUTO_INCREMENT for table `notas`
 --
 ALTER TABLE `notas`
   MODIFY `id_nota` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=246;
 
 --
--- AUTO_INCREMENT de la tabla `perfil`
+-- AUTO_INCREMENT for table `perfil`
 --
 ALTER TABLE `perfil`
   MODIFY `id_perfil` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT de la tabla `periodos`
+-- AUTO_INCREMENT for table `periodos`
 --
 ALTER TABLE `periodos`
   MODIFY `id_periodo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
--- AUTO_INCREMENT de la tabla `planes`
+-- AUTO_INCREMENT for table `planes`
 --
 ALTER TABLE `planes`
   MODIFY `id_plan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
--- AUTO_INCREMENT de la tabla `profesor`
+-- AUTO_INCREMENT for table `profesor`
 --
 ALTER TABLE `profesor`
   MODIFY `id_profesor` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
 
 --
--- AUTO_INCREMENT de la tabla `roles`
+-- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
   MODIFY `id_rol` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- AUTO_INCREMENT de la tabla `tipo_nota`
+-- AUTO_INCREMENT for table `tipo_nota`
 --
 ALTER TABLE `tipo_nota`
   MODIFY `id_tipo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
--- AUTO_INCREMENT de la tabla `usuario`
+-- AUTO_INCREMENT for table `usuario`
 --
 ALTER TABLE `usuario`
   MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
 
 --
--- AUTO_INCREMENT de la tabla `videos`
+-- AUTO_INCREMENT for table `videos`
 --
 ALTER TABLE `videos`
   MODIFY `id_video` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
--- Restricciones para tablas volcadas
+-- Constraints for dumped tables
 --
 
 --
--- Filtros para la tabla `alumno`
+-- Constraints for table `alumno`
 --
 ALTER TABLE `alumno`
   ADD CONSTRAINT `alumno_ibfk_1` FOREIGN KEY (`id_clase`) REFERENCES `clases` (`id_clase`);
 
 --
--- Filtros para la tabla `asistencia`
+-- Constraints for table `asistencia`
 --
 ALTER TABLE `asistencia`
   ADD CONSTRAINT `asistencia_ibfk_1` FOREIGN KEY (`id_alumno`) REFERENCES `alumno` (`id_alumno`);
 
 --
--- Filtros para la tabla `clases`
+-- Constraints for table `clases`
 --
 ALTER TABLE `clases`
   ADD CONSTRAINT `clases_ibfk_1` FOREIGN KEY (`id_nivel`) REFERENCES `niveles` (`id_nivel`),
   ADD CONSTRAINT `clases_ibfk_2` FOREIGN KEY (`id_dia`) REFERENCES `dias` (`id_dia`);
 
 --
--- Filtros para la tabla `clases_alumnos`
+-- Constraints for table `clases_alumnos`
 --
 ALTER TABLE `clases_alumnos`
   ADD CONSTRAINT `clases_alumnos_ibfk_1` FOREIGN KEY (`id_alumno`) REFERENCES `alumno` (`id_alumno`),
   ADD CONSTRAINT `clases_alumnos_ibfk_2` FOREIGN KEY (`id_clase`) REFERENCES `clases` (`id_clase`);
 
 --
--- Filtros para la tabla `clases_usuarios`
+-- Constraints for table `clases_usuarios`
 --
 ALTER TABLE `clases_usuarios`
   ADD CONSTRAINT `clases_usuarios_ibfk_1` FOREIGN KEY (`id_alumno`) REFERENCES `alumno` (`id_alumno`),
   ADD CONSTRAINT `clases_usuarios_ibfk_2` FOREIGN KEY (`id_clase`) REFERENCES `clases` (`id_clase`);
 
 --
--- Filtros para la tabla `cuotas`
+-- Constraints for table `cuotas`
 --
 ALTER TABLE `cuotas`
   ADD CONSTRAINT `cuotas_ibfk_1` FOREIGN KEY (`id_alumno`) REFERENCES `alumno` (`id_alumno`),
   ADD CONSTRAINT `cuotas_ibfk_2` FOREIGN KEY (`id_plan`) REFERENCES `planes` (`id_plan`);
 
 --
--- Filtros para la tabla `notas`
+-- Constraints for table `notas`
 --
 ALTER TABLE `notas`
   ADD CONSTRAINT `notas_ibfk_1` FOREIGN KEY (`id_alumno`) REFERENCES `alumno` (`id_alumno`),
@@ -2024,13 +2024,13 @@ ALTER TABLE `notas`
   ADD CONSTRAINT `notas_ibfk_3` FOREIGN KEY (`id_tipo_nota`) REFERENCES `tipo_nota` (`id_tipo`);
 
 --
--- Filtros para la tabla `profesor`
+-- Constraints for table `profesor`
 --
 ALTER TABLE `profesor`
   ADD CONSTRAINT `profesor_userId_foreign_idx` FOREIGN KEY (`userId`) REFERENCES `usuario` (`id_usuario`);
 
 --
--- Filtros para la tabla `usuario`
+-- Constraints for table `usuario`
 --
 ALTER TABLE `usuario`
   ADD CONSTRAINT `usuario_ibfk_1` FOREIGN KEY (`id_alumno`) REFERENCES `alumno` (`id_alumno`),
