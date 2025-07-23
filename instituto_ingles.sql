@@ -682,13 +682,13 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `obtenerUsuarioPorDni` (IN `dni` INT
         r.nombre AS rol,
         COALESCE(a.nombre, p.nombre) AS nombre_usuario -- Obtener nombre del alumno o profesor
     FROM 
-        Usuario u
+        usuario u
     LEFT JOIN 
-        Roles r ON u.id_rol = r.id_rol
+        roles r ON u.id_rol = r.id_rol
     LEFT JOIN 
-        Alumno a ON u.id_alumno = a.id_alumno
+        alumno a ON u.id_alumno = a.id_alumno
     LEFT JOIN 
-        Profesor p ON u.id_profesor = p.id_profesor
+        profesor p ON u.id_profesor = p.id_profesor
     WHERE 
         a.dni_alumno = dni OR p.dni = dni;
 END$$
