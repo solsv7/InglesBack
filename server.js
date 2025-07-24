@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/users');
 const gradesRoutes = require('./routes/Grades');
@@ -39,7 +40,7 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.use(cors({
-    origin: true,
+    origin: ['http://localhost:3000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
 }));
@@ -78,7 +79,10 @@ app.use('/api/planes', planesRoutes);
 app.use('/api/cuotas', cuotasRoutes);
 
 
-
+app.use(rateLimit({
+  windowMs: 1 * 60 * 1000, 
+  max: 50, 
+}));
 app.get('/api/secure-data', authenticateToken, (req, res) => {
     res.json({ message: 'Datos protegidos', user: req.user });
 });
