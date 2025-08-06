@@ -1,18 +1,15 @@
 const sequelize = require('../config/database');
 
 async function obtenerInfoPerfil(req, res) {
-    const { id_rol, id } = req.query; // Parámetros desde la petición
+    const { id_usuario } = req.query;
 
-    console.log('Parámetros recibidos en el backend:', { id_rol, id });
-
-    try {
-        const content = await sequelize.query(
-            'CALL obtenerInfoPerfil(:id_rol, :id)',
-            {
-                replacements: { id_rol, id },
-                type: sequelize.QueryTypes.RAW,
-            }
-        );
+const content = await sequelize.query(
+    'CALL obtenerInfoPerfil(?)',
+    {
+        replacements: [id_usuario],
+        type: sequelize.QueryTypes.RAW,
+    }
+);
 
         res.status(200).json(content);
     } catch (error) {

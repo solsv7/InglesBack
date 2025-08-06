@@ -50,20 +50,26 @@ CREATE PROCEDURE actualizarPerfil(
     IN p_id_foto INT
 )
 BEGIN
+    DECLARE v_id_perfil INT;
+
+    -- Guardar el id_perfil en una variable
+    SELECT perfil.id_perfil
+    INTO v_id_perfil
+    FROM perfil
+    JOIN usuario 
+        ON perfil.id_alumno = usuario.id_alumno
+        OR perfil.id_profesor = usuario.id_profesor
+    WHERE usuario.id_usuario = p_id_usuario
+    LIMIT 1;
+
+    -- Actualizar usando la variable
     UPDATE perfil
     SET
         whatsapp = COALESCE(p_whatsapp, whatsapp),
         whatsapp_adulto = COALESCE(p_whatsapp_adulto, whatsapp_adulto),
         mail = COALESCE(p_mail, mail),
         id_foto = COALESCE(p_id_foto, id_foto)
-    WHERE id_perfil = (
-        SELECT perfil.id_perfil
-        FROM perfil
-        JOIN usuario ON perfil.id_alumno = usuario.id_alumno
-                      OR perfil.id_profesor = usuario.id_profesor
-        WHERE usuario.id_usuario = p_id_usuario
-        LIMIT 1
-    );
+    WHERE id_perfil = v_id_perfil;
 END$$
 
 
@@ -495,16 +501,23 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerCuotasPorRango` (IN `p_desde
   WHERE c.fecha_inicio BETWEEN p_desde AND p_hasta;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `obtenerInfoPerfil` (IN `p_id_alumno` INT, IN `p_id_profesor` INT)   BEGIN
-    IF p_id_alumno IS NULL THEN
-        SELECT perfil.id_perfil,perfil.nombre, perfil.whatsapp, perfil.mail, perfil.id_foto 
-        FROM perfil
-        WHERE p_id_profesor = perfil.id_profesor;
-    ELSE
-        SELECT perfil.id_perfil,perfil.nombre, perfil.whatsapp, perfil.whatsapp_adulto, perfil.mail, perfil.id_foto 
-        FROM perfil
-        WHERE p_id_alumno = perfil.id_alumno;
-    END IF;
+CREATE PROCEDURE obtenerInfoPerfil(
+    IN p_id_usuario INT
+)
+BEGIN
+    SELECT 
+        perfil.id_perfil,
+        perfil.nombre, 
+        perfil.whatsapp, 
+        perfil.whatsapp_adulto,
+        perfil.mail, 
+        perfil.id_foto
+    FROM perfil
+    JOIN usuario 
+        ON perfil.id_alumno = usuario.id_alumno
+        OR perfil.id_profesor = usuario.id_profesor
+    WHERE usuario.id_usuario = p_id_usuario
+    LIMIT 1;
 END$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerInscripciones` ()   BEGIN
