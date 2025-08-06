@@ -23,9 +23,9 @@ async function obtenerInfoPerfil(req, res) {
 
 async function actualizarPerfil(req, res) {
     try {
-        const { id, whatsapp, whatsapp_adulto, mail, id_foto, id_perfil } = req.body;
+        const { id_usuario, whatsapp, whatsapp_adulto, mail, id_foto} = req.body;
 
-        console.log('Parámetros para actualizar perfil:', { id, whatsapp, whatsapp_adulto, mail, id_foto, id_perfil });
+        console.log('Parámetros para actualizar perfil:', { id, whatsapp, whatsapp_adulto, mail, id_foto});
 
         const content = await sequelize.query(
             'CALL actualizarPerfil(?, ?, ?, ?, ?)', 
