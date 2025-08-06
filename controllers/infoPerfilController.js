@@ -28,18 +28,17 @@ async function actualizarPerfil(req, res) {
         console.log('Parámetros para actualizar perfil:', { id, whatsapp, whatsapp_adulto, mail, id_foto, id_perfil });
 
         const content = await sequelize.query(
-            'CALL actualizarPerfil(:id, :whatsapp, :whatsapp_adulto, :mail, :id_foto, :id_perfil)',
-            {
-                replacements: { 
-                    id, 
-                    whatsapp, 
-                    whatsapp_adulto, 
-                    mail, 
-                    id_foto, 
-                    id_perfil 
-                },
-                type: sequelize.QueryTypes.RAW,
-            }
+            'CALL actualizarPerfil(?, ?, ?, ?, ?)', 
+    {
+        replacements: [
+            id_usuario,
+            whatsapp || null,
+            whatsapp_adulto || null,
+            mail || null,
+            id_foto || null
+        ],
+        type: sequelize.QueryTypes.RAW
+    }
         );
             
 

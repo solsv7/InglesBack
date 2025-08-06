@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 06, 2025 at 09:28 PM
+-- Generation Time: Jul 23, 2025 at 09:57 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -41,35 +41,38 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `ActualizarInscripcion` (IN `p_id_al
     WHERE id_alumno = p_id_alumno AND id_clase = p_id_clase_actual;
 END$$
 
-
-CREATE PROCEDURE actualizarPerfil(
-    IN p_id_usuario INT,
-    IN p_whatsapp VARCHAR(255),
-    IN p_whatsapp_adulto VARCHAR(255),
-    IN p_mail VARCHAR(255),
-    IN p_id_foto INT
-)
-BEGIN
-    UPDATE perfil
-    SET
-        whatsapp = COALESCE(p_whatsapp, whatsapp),
-        whatsapp_adulto = COALESCE(p_whatsapp_adulto, whatsapp_adulto),
-        mail = COALESCE(p_mail, mail),
-        id_foto = COALESCE(p_id_foto, id_foto)
-    WHERE id_perfil = (
-        SELECT perfil.id_perfil
-        FROM perfil
-        JOIN usuario ON perfil.id_alumno = usuario.id_alumno
-                      OR perfil.id_profesor = usuario.id_profesor
-        WHERE usuario.id_usuario = p_id_usuario
-        LIMIT 1
-    );
+CREATE DEFINER=`root`@`localhost` PROCEDURE `actualizarNota` (IN `p_id_alumno` INT, IN `p_id_periodo` INT, IN `p_id_tipo_nota` INT, IN `p_nota` DECIMAL(5,2), IN `p_ciclo_lectivo` INT)   BEGIN
+    -- Verificar si ya existe una nota para el mismo alumno, periodo, tipo de nota y ciclo lectivo
+    IF EXISTS (SELECT 1 
+               FROM Notas 
+               WHERE id_alumno = p_id_alumno 
+               AND id_periodo = p_id_periodo 
+               AND id_tipo_nota = p_id_tipo_nota 
+               AND ciclo_lectivo = p_ciclo_lectivo) THEN
+        -- Si existe, actualizar la nota
+        UPDATE Notas
+        SET nota = p_nota
+        WHERE id_alumno = p_id_alumno 
+          AND id_periodo = p_id_periodo 
+          AND id_tipo_nota = p_id_tipo_nota 
+          AND ciclo_lectivo = p_ciclo_lectivo;
+    ELSE
+        -- Si no existe, insertar la nueva nota
+        INSERT INTO Notas (id_alumno, id_periodo, id_tipo_nota, nota, ciclo_lectivo)
+        VALUES (p_id_alumno, p_id_periodo, p_id_tipo_nota, p_nota, p_ciclo_lectivo);
+    END IF;
 END$$
 
-
+CREATE DEFINER=`root`@`localhost` PROCEDURE `actualizarPerfil` (IN `n_id_alumno` INT, IN `n_id_profesor` INT, IN `n_whatsapp` VARCHAR(255), IN `n_whatsapp_adulto` VARCHAR(255), IN `n_mail` VARCHAR(255), IN `n_id_foto` INT, IN `n_id_perfil` INT)   UPDATE perfil
+    SET
+        whatsapp = COALESCE(n_whatsapp, whatsapp), -- Si `n_whatsapp` es NULL, mantén el valor actual
+        whatsapp_adulto = COALESCE(n_whatsapp_adulto, whatsapp_adulto),
+        mail = COALESCE(n_mail, mail),
+        id_foto = COALESCE(n_id_foto, id_foto)
+    WHERE id_perfil = n_id_perfil$$
 
 CREATE DEFINER=`root`@`localhost` PROCEDURE `actualizar_contrasenia` (IN `p_id_usuario` INT, IN `p_nueva_contrasenia` VARCHAR(255))   BEGIN
-    UPDATE usuario
+    UPDATE Usuario
     SET password = p_nueva_contrasenia
     WHERE id_usuario = p_id_usuario;
 END$$
@@ -83,23 +86,23 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `crearAlumno` (IN `p_dni` INT, IN `p
     DECLARE p_id_persona INT;
 
     -- Paso 1: Insertar en la tabla Usuario
-    INSERT INTO usuario (id_alumno, id_profesor, id_rol, password)
+    INSERT INTO Usuario (id_alumno, id_profesor, id_rol, password)
     VALUES (NULL, NULL, 3, p_password);
     SET p_id_usuario = LAST_INSERT_ID(); -- Obtener el ID del usuario recién creado
 
     -- Verificar si el alumno ya existe
-    IF NOT EXISTS (SELECT 1 FROM alumno WHERE dni_alumno = p_dni) THEN
+    IF NOT EXISTS (SELECT 1 FROM Alumno WHERE dni_alumno = p_dni) THEN
         -- Insertar un nuevo alumno
-        INSERT INTO alumno (dni_alumno, nombre, id_clase)
+        INSERT INTO Alumno (dni_alumno, nombre, id_clase)
         VALUES (p_dni, p_nombre, NULL);
         SET p_id_persona = LAST_INSERT_ID(); -- Obtener el ID del alumno insertado
     ELSE
         -- Si ya existe, obtener el ID del alumno
-        SET p_id_persona = (SELECT id_alumno FROM alumno WHERE dni_alumno = p_dni);
+        SET p_id_persona = (SELECT id_alumno FROM Alumno WHERE dni_alumno = p_dni);
     END IF;
 
     -- Actualizar la tabla Usuario con el ID del alumno
-    UPDATE usuario SET id_alumno = p_id_persona WHERE id_usuario = p_id_usuario;
+    UPDATE Usuario SET id_alumno = p_id_persona WHERE id_usuario = p_id_usuario;
 
     -- Insertar en la tabla perfil
     INSERT INTO perfil (nombre, whatsapp, whatsapp_adulto, mail, id_alumno)
@@ -138,7 +141,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `crearProfesor` (IN `p_dni` INT, IN 
     DECLARE p_id_persona INT;
 
     -- Paso 1: Insertar en la tabla Usuario
-    INSERT INTO usuario (id_alumno, id_profesor, id_rol, password)
+    INSERT INTO Usuario (id_alumno, id_profesor, id_rol, password)
     VALUES (NULL, NULL, 2, p_password);
     SET p_id_usuario = LAST_INSERT_ID(); -- Obtener el ID del usuario recién creado
 
@@ -157,7 +160,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `crearProfesor` (IN `p_dni` INT, IN 
     END IF;
 
     -- Actualizar la tabla Usuario con el ID del profesor
-    UPDATE usuario SET id_profesor = p_id_persona WHERE id_usuario = p_id_usuario;
+    UPDATE Usuario SET id_profesor = p_id_persona WHERE id_usuario = p_id_usuario;
 
     -- Insertar en la tabla perfil
     INSERT INTO perfil (nombre, whatsapp, mail, id_profesor)
@@ -177,34 +180,34 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `CrearUsuarioConPersona` (IN `p_dni`
     DECLARE p_id_persona INT;
 
     -- Paso 1: Insertar en la tabla Usuario
-    INSERT INTO usuario (id_alumno, id_profesor, id_rol, password)
+    INSERT INTO Usuario (id_alumno, id_profesor, id_rol, password)
     VALUES (NULL, NULL, p_rol, p_password);
     SET p_id_usuario = LAST_INSERT_ID(); -- Obtener el ID del usuario recién creado
 
     -- Paso 2: Insertar o actualizar la tabla correspondiente según el rol
     IF p_rol = 2 THEN
         -- Profesor
-        INSERT INTO profesor (dni, nombre, userId)
+        INSERT INTO Profesor (dni, nombre, userId)
         VALUES (p_dni, p_nombre, p_id_usuario);
         SET p_id_persona = LAST_INSERT_ID(); -- Obtener el ID del profesor insertado
 
         -- Actualizar la tabla Usuario con el ID del profesor
-        UPDATE usuario SET id_profesor = p_id_persona WHERE id_usuario = p_id_usuario;
+        UPDATE Usuario SET id_profesor = p_id_persona WHERE id_usuario = p_id_usuario;
 
     ELSEIF p_rol = 3 THEN
         -- Alumno: Verificar si ya existe
-        IF NOT EXISTS (SELECT 1 FROM alumno WHERE dni_alumno = p_dni) THEN
+        IF NOT EXISTS (SELECT 1 FROM Alumno WHERE dni_alumno = p_dni) THEN
             -- Insertar un nuevo alumno
-            INSERT INTO alumno (dni_alumno, nombre, id_clase)
+            INSERT INTO Alumno (dni_alumno, nombre, id_clase)
             VALUES (p_dni, p_nombre, p_id_clase);
             SET p_id_persona = LAST_INSERT_ID(); -- Obtener el ID del alumno insertado
         ELSE
             -- Si ya existe, obtener el ID del alumno
-            SET p_id_persona = (SELECT id_alumno FROM alumno WHERE dni_alumno = p_dni);
+            SET p_id_persona = (SELECT id_alumno FROM Alumno WHERE dni_alumno = p_dni);
         END IF;
 
         -- Actualizar la tabla Usuario con el ID del alumno
-        UPDATE usuario SET id_alumno = p_id_persona WHERE id_usuario = p_id_usuario;
+        UPDATE Usuario SET id_alumno = p_id_persona WHERE id_usuario = p_id_usuario;
     END IF;
 
 END$$
@@ -213,40 +216,40 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `CrearUsuarioConPersona2` (IN `p_dni
     DECLARE p_id_persona INT;
 
     -- Paso 1: Insertar en la tabla Usuario
-    INSERT INTO usuario (id_alumno, id_profesor, id_rol, password)
+    INSERT INTO Usuario (id_alumno, id_profesor, id_rol, password)
     VALUES (NULL, NULL, p_rol, p_password);
     SET p_id_usuario = LAST_INSERT_ID(); -- Obtener el ID del usuario recién creado
 
     -- Paso 2: Insertar o actualizar la tabla correspondiente según el rol
     IF p_rol = 2 THEN
         -- Profesor
-        INSERT INTO profesor (dni, nombre, userId)
+        INSERT INTO Profesor (dni, nombre, userId)
         VALUES (p_dni, p_nombre, p_id_usuario);
         SET p_id_persona = LAST_INSERT_ID(); -- Obtener el ID del profesor insertado
 
         -- Actualizar la tabla Usuario con el ID del profesor
-        UPDATE usuario SET id_profesor = p_id_persona WHERE id_usuario = p_id_usuario;
+        UPDATE Usuario SET id_profesor = p_id_persona WHERE id_usuario = p_id_usuario;
 
     ELSEIF p_rol = 3 THEN
         -- Alumno: Verificar si el ID de clase es válido
-        IF p_id_clase IS NOT NULL AND NOT EXISTS (SELECT 1 FROM clases WHERE id_clase = p_id_clase) THEN
+        IF p_id_clase IS NOT NULL AND NOT EXISTS (SELECT 1 FROM Clases WHERE id_clase = p_id_clase) THEN
             SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'El ID de clase proporcionado no existe.';
         END IF;
 
         -- Alumno: Verificar si ya existe
-        IF NOT EXISTS (SELECT 1 FROM alumno WHERE dni_alumno = p_dni) THEN
+        IF NOT EXISTS (SELECT 1 FROM Alumno WHERE dni_alumno = p_dni) THEN
             -- Insertar un nuevo alumno
-            INSERT INTO alumno (dni_alumno, nombre, id_clase)
+            INSERT INTO Alumno (dni_alumno, nombre, id_clase)
             VALUES (p_dni, p_nombre, p_id_clase);
             SET p_id_persona = LAST_INSERT_ID(); -- Obtener el ID del alumno insertado
         ELSE
             -- Si ya existe, obtener el ID del alumno
-            SET p_id_persona = (SELECT id_alumno FROM alumno WHERE dni_alumno = p_dni);
+            SET p_id_persona = (SELECT id_alumno FROM Alumno WHERE dni_alumno = p_dni);
         END IF;
 
         -- Actualizar la tabla Usuario con el ID del alumno
-        UPDATE usuario SET id_alumno = p_id_persona WHERE id_usuario = p_id_usuario;
+        UPDATE Usuario SET id_alumno = p_id_persona WHERE id_usuario = p_id_usuario;
 
         -- Insertar en la tabla perfil
         INSERT INTO perfil (nombre, whatsapp, whatsapp_adulto, mail, id_alumno)
@@ -606,11 +609,11 @@ END IF;
         t.nombre AS tipo_nota, 
         n.nota 
     FROM 
-        notas n
+        Notas n
     INNER JOIN 
-        periodos p ON n.id_periodo = p.id_periodo
+        Periodos p ON n.id_periodo = p.id_periodo
     INNER JOIN 
-        tipo_nota t ON n.id_tipo_nota = t.id_tipo
+        Tipo_nota t ON n.id_tipo_nota = t.id_tipo
     WHERE 
         n.id_alumno = p_id_alumno AND n.ciclo_lectivo = p_ciclo_lectivo
     ORDER BY 
@@ -815,14 +818,14 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `SubirNota` (IN `p_id_alumno` INT, I
     -- Verificar si ya existe una nota para el mismo alumno, periodo, tipo de nota y ciclo lectivo
     IF EXISTS (
         SELECT 1 
-        FROM notas 
+        FROM Notas 
         WHERE id_alumno = p_id_alumno 
           AND id_periodo = p_id_periodo 
           AND id_tipo_nota = p_id_tipo_nota 
           AND ciclo_lectivo = p_ciclo_lectivo
     ) THEN
         -- Si existe, actualizar la nota
-        UPDATE notas
+        UPDATE Notas
         SET nota = p_nota
         WHERE id_alumno = p_id_alumno 
           AND id_periodo = p_id_periodo 
@@ -830,7 +833,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `SubirNota` (IN `p_id_alumno` INT, I
           AND ciclo_lectivo = p_ciclo_lectivo;
     ELSE
         -- Si no existe, insertar la nueva nota
-        INSERT INTO notas (id_alumno, id_periodo, id_tipo_nota, nota, ciclo_lectivo)
+        INSERT INTO Notas (id_alumno, id_periodo, id_tipo_nota, nota, ciclo_lectivo)
         VALUES (p_id_alumno, p_id_periodo, p_id_tipo_nota, p_nota, p_ciclo_lectivo);
     END IF;
 END$$

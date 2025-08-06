@@ -1,0 +1,11 @@
+### Probar actualizarNota
+POST https://inglesback-stx6.onrender.com/api/grades
+Content-Type: application/json
+
+{
+  "idAlumno": 2,
+  "idPeriodo": 1,
+  "idTipoNota": 3,
+  "nota": 8.50,
+  "cicloLectivo": 2025
+}
