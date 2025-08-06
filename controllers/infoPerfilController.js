@@ -3,13 +3,14 @@ const sequelize = require('../config/database');
 async function obtenerInfoPerfil(req, res) {
     const { id_usuario } = req.query;
 
-const content = await sequelize.query(
-    'CALL obtenerInfoPerfil(?)',
-    {
-        replacements: [id_usuario],
-        type: sequelize.QueryTypes.RAW,
-    }
-);
+    try {
+        const content = await sequelize.query(
+            'CALL obtenerInfoPerfil(?)',
+            {
+                replacements: [id_usuario],
+                type: sequelize.QueryTypes.RAW,
+            }
+        );
 
         res.status(200).json(content);
     } catch (error) {
@@ -17,6 +18,7 @@ const content = await sequelize.query(
         res.status(500).json({ error: 'Error al obtener el perfil' });
     }
 }
+
 
 async function actualizarPerfil(req, res) {
     try {
