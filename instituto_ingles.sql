@@ -25,7 +25,7 @@ DELIMITER $$
 --
 -- Procedures
 --
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ActualizarClase` (IN `p_id_clase` INT, IN `p_id_dia` INT, IN `p_id_nivel` INT, IN `p_hora_inicio` TIME, IN `p_hora_fin` TIME)   BEGIN
+ CREATE PROCEDURE `ActualizarClase` (IN `p_id_clase` INT, IN `p_id_dia` INT, IN `p_id_nivel` INT, IN `p_hora_inicio` TIME, IN `p_hora_fin` TIME)   BEGIN
   UPDATE clases
   SET
     id_dia = p_id_dia,
@@ -35,11 +35,12 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `ActualizarClase` (IN `p_id_clase` I
   WHERE id_clase = p_id_clase;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ActualizarInscripcion` (IN `p_id_alumno` INT, IN `p_id_clase_actual` INT, IN `p_id_clase_nueva` INT)   BEGIN
+ CREATE PROCEDURE `ActualizarInscripcion` (IN `p_id_alumno` INT, IN `p_id_clase_actual` INT, IN `p_id_clase_nueva` INT)   BEGIN
     UPDATE clases_alumnos
     SET id_clase = p_id_clase_nueva
     WHERE id_alumno = p_id_alumno AND id_clase = p_id_clase_actual;
 END$$
+
 
 
 CREATE PROCEDURE actualizarPerfil(
@@ -74,18 +75,18 @@ END$$
 
 
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `actualizar_contrasenia` (IN `p_id_usuario` INT, IN `p_nueva_contrasenia` VARCHAR(255))   BEGIN
+ CREATE PROCEDURE `actualizar_contrasenia` (IN `p_id_usuario` INT, IN `p_nueva_contrasenia` VARCHAR(255))   BEGIN
     UPDATE usuario
     SET password = p_nueva_contrasenia
     WHERE id_usuario = p_id_usuario;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `AgregarNivel` (IN `p_nombre` VARCHAR(100), IN `p_idioma` VARCHAR(50))   BEGIN
+ CREATE PROCEDURE `AgregarNivel` (IN `p_nombre` VARCHAR(100), IN `p_idioma` VARCHAR(50))   BEGIN
   INSERT INTO niveles (nombre, idioma, activo)
   VALUES (p_nombre, p_idioma, 1);
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `crearAlumno` (IN `p_dni` INT, IN `p_nombre` VARCHAR(255), IN `p_password` VARCHAR(255), IN `p_mail` VARCHAR(255), IN `p_whatsapp` VARCHAR(255), IN `p_whatsapp_adulto` VARCHAR(255), OUT `p_id_usuario` INT)   BEGIN
+ CREATE PROCEDURE `crearAlumno` (IN `p_dni` INT, IN `p_nombre` VARCHAR(255), IN `p_password` VARCHAR(255), IN `p_mail` VARCHAR(255), IN `p_whatsapp` VARCHAR(255), IN `p_whatsapp_adulto` VARCHAR(255), OUT `p_id_usuario` INT)   BEGIN
     DECLARE p_id_persona INT;
 
     -- Paso 1: Insertar en la tabla Usuario
@@ -113,7 +114,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `crearAlumno` (IN `p_dni` INT, IN `p
 
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `CrearCuota` (IN `p_id_alumno` INT, IN `p_id_plan` INT, IN `p_fecha_inicio` DATE, IN `p_fecha_vencimiento` DATE)   BEGIN
+ CREATE PROCEDURE `CrearCuota` (IN `p_id_alumno` INT, IN `p_id_plan` INT, IN `p_fecha_inicio` DATE, IN `p_fecha_vencimiento` DATE)   BEGIN
   INSERT INTO cuotas (
     id_alumno,
     id_plan,
@@ -130,17 +131,17 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `CrearCuota` (IN `p_id_alumno` INT, 
   );
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `CrearPeriodo` (IN `p_nombre` VARCHAR(100))   BEGIN
+ CREATE PROCEDURE `CrearPeriodo` (IN `p_nombre` VARCHAR(100))   BEGIN
     INSERT INTO periodos (nombre, activo)
     VALUES (p_nombre, 1);
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `CrearPlan` (IN `p_nombre` VARCHAR(100), IN `p_descripcion` TEXT, IN `p_monto` DECIMAL(10,2))   BEGIN
+ CREATE PROCEDURE `CrearPlan` (IN `p_nombre` VARCHAR(100), IN `p_descripcion` TEXT, IN `p_monto` DECIMAL(10,2))   BEGIN
   INSERT INTO planes (nombre, descripcion, monto, activa)
   VALUES (p_nombre, p_descripcion, p_monto, TRUE);
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `crearProfesor` (IN `p_dni` INT, IN `p_nombre` VARCHAR(255), IN `p_password` VARCHAR(255), IN `p_mail` VARCHAR(255), OUT `p_id_usuario` INT)   BEGIN
+ CREATE PROCEDURE `crearProfesor` (IN `p_dni` INT, IN `p_nombre` VARCHAR(255), IN `p_password` VARCHAR(255), IN `p_mail` VARCHAR(255), OUT `p_id_usuario` INT)   BEGIN
     DECLARE p_id_persona INT;
 
     -- Paso 1: Insertar en la tabla Usuario
@@ -171,7 +172,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `crearProfesor` (IN `p_dni` INT, IN 
 
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `crearUsuario` (IN `p_dni_alumno` VARCHAR(255), IN `p_nombre` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
+ CREATE PROCEDURE `crearUsuario` (IN `p_dni_alumno` VARCHAR(255), IN `p_nombre` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
     INSERT INTO usuario (id_alumno, id_profesor, id_rol, usuario.password)
     VALUES (null, null, 4, p_password);
     
@@ -179,7 +180,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `crearUsuario` (IN `p_dni_alumno` VA
     VALUES(p_dni_alumno,p_nombre,null);
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `CrearUsuarioConPersona` (IN `p_dni` INT, IN `p_nombre` VARCHAR(255), IN `p_password` VARCHAR(255), IN `p_rol` INT, IN `p_id_clase` INT, OUT `p_id_usuario` INT)   BEGIN
+ CREATE PROCEDURE `CrearUsuarioConPersona` (IN `p_dni` INT, IN `p_nombre` VARCHAR(255), IN `p_password` VARCHAR(255), IN `p_rol` INT, IN `p_id_clase` INT, OUT `p_id_usuario` INT)   BEGIN
     DECLARE p_id_persona INT;
 
     -- Paso 1: Insertar en la tabla Usuario
@@ -215,7 +216,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `CrearUsuarioConPersona` (IN `p_dni`
 
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `CrearUsuarioConPersona2` (IN `p_dni` INT, IN `p_nombre` VARCHAR(255), IN `p_password` VARCHAR(255), IN `p_rol` INT, IN `p_id_clase` INT, IN `p_mail` VARCHAR(255), IN `p_whatsapp` VARCHAR(255), IN `p_whatsapp_adulto` VARCHAR(255), OUT `p_id_usuario` INT)   BEGIN
+ CREATE PROCEDURE `CrearUsuarioConPersona2` (IN `p_dni` INT, IN `p_nombre` VARCHAR(255), IN `p_password` VARCHAR(255), IN `p_rol` INT, IN `p_id_clase` INT, IN `p_mail` VARCHAR(255), IN `p_whatsapp` VARCHAR(255), IN `p_whatsapp_adulto` VARCHAR(255), OUT `p_id_usuario` INT)   BEGIN
     DECLARE p_id_persona INT;
 
     -- Paso 1: Insertar en la tabla Usuario
@@ -261,7 +262,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `CrearUsuarioConPersona2` (IN `p_dni
 
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `EditarCuota` (IN `p_id_cuota` INT, IN `p_id_plan` VARCHAR(10), IN `p_fecha_inicio` VARCHAR(20), IN `p_fecha_vencimiento` VARCHAR(20), IN `p_estado_pago` VARCHAR(20))   BEGIN
+ CREATE PROCEDURE `EditarCuota` (IN `p_id_cuota` INT, IN `p_id_plan` VARCHAR(10), IN `p_fecha_inicio` VARCHAR(20), IN `p_fecha_vencimiento` VARCHAR(20), IN `p_estado_pago` VARCHAR(20))   BEGIN
   UPDATE cuotas
   SET
     id_plan = COALESCE(NULLIF(p_id_plan, ''), id_plan),
@@ -271,20 +272,20 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `EditarCuota` (IN `p_id_cuota` INT, 
   WHERE id_cuota = p_id_cuota;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `EditarNivel` (IN `p_id_nivel` INT, IN `p_nombre` VARCHAR(100), IN `p_idioma` VARCHAR(50))   BEGIN
+ CREATE PROCEDURE `EditarNivel` (IN `p_id_nivel` INT, IN `p_nombre` VARCHAR(100), IN `p_idioma` VARCHAR(50))   BEGIN
   UPDATE niveles
   SET nombre = p_nombre,
       idioma = p_idioma
   WHERE id_nivel = p_id_nivel;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `EditarPeriodo` (IN `p_id_periodo` INT, IN `p_nombre` VARCHAR(100))   BEGIN
+ CREATE PROCEDURE `EditarPeriodo` (IN `p_id_periodo` INT, IN `p_nombre` VARCHAR(100))   BEGIN
     UPDATE periodos
     SET nombre = p_nombre
     WHERE id_periodo = p_id_periodo;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `EditarPlan` (IN `p_id_plan` INT, IN `p_nombre` VARCHAR(100), IN `p_descripcion` TEXT, IN `p_monto` DECIMAL(10,2))   BEGIN
+ CREATE PROCEDURE `EditarPlan` (IN `p_id_plan` INT, IN `p_nombre` VARCHAR(100), IN `p_descripcion` TEXT, IN `p_monto` DECIMAL(10,2))   BEGIN
   UPDATE planes
   SET nombre = COALESCE(p_nombre, nombre),
       descripcion = COALESCE(p_descripcion, descripcion),
@@ -292,7 +293,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `EditarPlan` (IN `p_id_plan` INT, IN
   WHERE id_plan = p_id_plan;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `editar_clase` (IN `p_id_clase` INT, IN `p_id_nivel` INT, IN `p_id_dia` INT, IN `p_id_horario` INT)   BEGIN
+ CREATE PROCEDURE `editar_clase` (IN `p_id_clase` INT, IN `p_id_nivel` INT, IN `p_id_dia` INT, IN `p_id_horario` INT)   BEGIN
     -- Asegurarse de que la clase existe
     IF NOT EXISTS (SELECT 1 FROM clases WHERE id_clase = p_id_clase) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La clase no existe';
@@ -307,7 +308,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `editar_clase` (IN `p_id_clase` INT,
     SELECT p_id_clase AS id_clase_actualizada;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `EliminarClase` (IN `p_id_clase` INT)   BEGIN
+ CREATE PROCEDURE `EliminarClase` (IN `p_id_clase` INT)   BEGIN
     -- Verificamos si la clase existe
     IF EXISTS (SELECT 1 FROM clases WHERE id_clase = p_id_clase) THEN
         -- Cambiamos la disponibilidad en lugar de eliminar
@@ -318,39 +319,39 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `EliminarClase` (IN `p_id_clase` INT
     END IF;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `EliminarCuota` (IN `p_id_cuota` INT)   BEGIN
+ CREATE PROCEDURE `EliminarCuota` (IN `p_id_cuota` INT)   BEGIN
   DELETE FROM cuotas WHERE id_cuota = p_id_cuota;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `EliminarInscripcion` (IN `p_id_alumno` INT, IN `p_id_clase` INT)   BEGIN
+ CREATE PROCEDURE `EliminarInscripcion` (IN `p_id_alumno` INT, IN `p_id_clase` INT)   BEGIN
     DELETE FROM clases_alumnos
     WHERE id_alumno = p_id_alumno AND id_clase = p_id_clase;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `EliminarNivel` (IN `p_id_nivel` INT)   BEGIN
+ CREATE PROCEDURE `EliminarNivel` (IN `p_id_nivel` INT)   BEGIN
   UPDATE niveles
   SET activo = 0
   WHERE id_nivel = p_id_nivel;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `EliminarPeriodo` (IN `p_id_periodo` INT)   BEGIN
+ CREATE PROCEDURE `EliminarPeriodo` (IN `p_id_periodo` INT)   BEGIN
     UPDATE periodos
     SET activo = 0
     WHERE id_periodo = p_id_periodo;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `EliminarPlan` (IN `p_id_plan` INT)   BEGIN
+ CREATE PROCEDURE `EliminarPlan` (IN `p_id_plan` INT)   BEGIN
   UPDATE planes
   SET activa = FALSE
   WHERE id_plan = p_id_plan;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `InscribirAlumnoClase` (IN `p_id_alumno` INT, IN `p_id_clase` INT)   BEGIN
+ CREATE PROCEDURE `InscribirAlumnoClase` (IN `p_id_alumno` INT, IN `p_id_clase` INT)   BEGIN
     INSERT INTO clases_alumnos (id_alumno, id_clase)
     VALUES (p_id_alumno, p_id_clase);
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `insertar_clase` (IN `p_id_nivel` INT, IN `p_id_dia` INT, IN `p_hora_inicio` TIME, IN `p_hora_fin` TIME)   BEGIN
+ CREATE PROCEDURE `insertar_clase` (IN `p_id_nivel` INT, IN `p_id_dia` INT, IN `p_hora_inicio` TIME, IN `p_hora_fin` TIME)   BEGIN
   IF NOT EXISTS (SELECT 1 FROM niveles WHERE id_nivel = p_id_nivel) THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El id_nivel no existe';
   END IF;
@@ -365,7 +366,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `insertar_clase` (IN `p_id_nivel` IN
   SELECT LAST_INSERT_ID() AS id_clase_insertada;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerAlumnosPorClase` (IN `p_id_clase` INT)   BEGIN
+ CREATE PROCEDURE `ObtenerAlumnosPorClase` (IN `p_id_clase` INT)   BEGIN
     SELECT 
         a.id_alumno,
         a.nombre AS nombre_alumno
@@ -374,7 +375,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerAlumnosPorClase` (IN `p_id_c
     WHERE ca.id_clase = p_id_clase;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerAsistenciasPorClaseYFecha` (IN `p_id_clase` INT, IN `p_fecha` DATE)   BEGIN
+ CREATE PROCEDURE `ObtenerAsistenciasPorClaseYFecha` (IN `p_id_clase` INT, IN `p_fecha` DATE)   BEGIN
   SELECT 
     cu.id_alumno,
     a.nombre AS nombre_alumno,
@@ -384,7 +385,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerAsistenciasPorClaseYFecha` (
   WHERE cu.id_clase = p_id_clase AND cu.fecha = p_fecha;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerAsistenciasPorFechaAlumno` (IN `p_id_alumno` INT, IN `p_fecha` DATE)   BEGIN
+ CREATE PROCEDURE `ObtenerAsistenciasPorFechaAlumno` (IN `p_id_alumno` INT, IN `p_fecha` DATE)   BEGIN
   SELECT 
     c.id_clase,
     d.nombre AS dia,
@@ -399,7 +400,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerAsistenciasPorFechaAlumno` (
   WHERE cu.id_alumno = p_id_alumno AND cu.fecha = p_fecha;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerAsistenciasPorRangoAlumno` (IN `p_id_alumno` INT, IN `p_fecha_inicio` DATE, IN `p_fecha_fin` DATE)   BEGIN
+ CREATE PROCEDURE `ObtenerAsistenciasPorRangoAlumno` (IN `p_id_alumno` INT, IN `p_fecha_inicio` DATE, IN `p_fecha_fin` DATE)   BEGIN
   SELECT 
     COUNT(*) AS total_clases,
     SUM(presente = 1) AS total_presentes,
@@ -411,12 +412,12 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerAsistenciasPorRangoAlumno` (
     AND fecha BETWEEN p_fecha_inicio AND p_fecha_fin;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerCategorias` ()   BEGIN
+ CREATE PROCEDURE `ObtenerCategorias` ()   BEGIN
     SELECT id_tipo, nombre
     FROM tipo_nota;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerClases` ()   BEGIN
+ CREATE PROCEDURE `ObtenerClases` ()   BEGIN
   SELECT 
     c.id_clase,
     c.id_nivel,
@@ -431,40 +432,35 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerClases` ()   BEGIN
   WHERE c.disponible = 1;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerClasesPorFecha` (IN `p_fecha` DATE)   BEGIN
-  DECLARE dia_nombre VARCHAR(20);
-  DECLARE dia_id INT;
+CREATE PROCEDURE ObtenerClasesPorFecha(IN p_fecha DATE)
+BEGIN
+    DECLARE dia_nombre VARCHAR(20);
+    DECLARE dia_id INT;
 
-  -- Obtener el nombre del día en español
-  SET dia_nombre = ELT(WEEKDAY(p_fecha) + 1, 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo');
+    -- Obtener el nombre del día según la fecha
+    SET dia_nombre = ELT(WEEKDAY(p_fecha) + 1, 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo');
 
-  -- Obtener el id del día desde la tabla dias
-  SELECT id_dia INTO dia_id
-  FROM dias
-  WHERE nombre = dia_nombre
-  LIMIT 1;
+    -- Buscar el id_dia forzando collation para evitar conflictos
+    SELECT id_dia INTO dia_id
+    FROM dias
+    WHERE nombre COLLATE utf8mb4_general_ci = dia_nombre COLLATE utf8mb4_general_ci;
 
-  -- Devolver las clases correspondientes a ese día
-  SELECT 
-    c.id_clase,
-    d.nombre AS dia,
-    n.nombre AS nivel,
-    c.hora_inicio,
-    c.hora_fin
-  FROM clases c
-  JOIN dias d ON c.id_dia = d.id_dia
-  JOIN niveles n ON c.id_nivel = n.id_nivel
-  WHERE c.id_dia = dia_id AND c.disponible = 1;
+    -- Retornar las clases disponibles para ese día
+    SELECT c.*, d.nombre AS dia_nombre
+    FROM clases c
+    INNER JOIN dias d ON c.id_dia = d.id_dia
+    WHERE c.id_dia = dia_id
+      AND c.disponible = 1;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerCuotas` ()   BEGIN
+ CREATE PROCEDURE `ObtenerCuotas` ()   BEGIN
   SELECT c.*, a.nombre AS nombre_alumno, p.nombre AS nombre_plan
   FROM cuotas c
   JOIN alumno a ON c.id_alumno = a.id_alumno
   JOIN planes p ON c.id_plan = p.id_plan;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerCuotasPendientes` ()   BEGIN
+ CREATE PROCEDURE `ObtenerCuotasPendientes` ()   BEGIN
   SELECT c.*, a.nombre AS nombre_alumno, p.nombre AS nombre_plan
   FROM cuotas c
   JOIN alumno a ON c.id_alumno = a.id_alumno
@@ -472,14 +468,14 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerCuotasPendientes` ()   BEGIN
   WHERE c.estado_pago = 'pendiente';
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerCuotasPorAlumno` (IN `p_id_alumno` INT)   BEGIN
+ CREATE PROCEDURE `ObtenerCuotasPorAlumno` (IN `p_id_alumno` INT)   BEGIN
   SELECT c.*, p.nombre AS nombre_plan
   FROM cuotas c
   JOIN planes p ON c.id_plan = p.id_plan
   WHERE c.id_alumno = p_id_alumno;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerCuotasPorAnio` (IN `anio` INT)   BEGIN
+ CREATE PROCEDURE `ObtenerCuotasPorAnio` (IN `anio` INT)   BEGIN
   SELECT 
     c.id_cuota,
     a.nombre AS nombre_alumno,
@@ -493,7 +489,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerCuotasPorAnio` (IN `anio` IN
   WHERE YEAR(c.fecha_inicio) = anio;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerCuotasPorRango` (IN `p_desde` DATE, IN `p_hasta` DATE)   BEGIN
+ CREATE PROCEDURE `ObtenerCuotasPorRango` (IN `p_desde` DATE, IN `p_hasta` DATE)   BEGIN
   SELECT c.*, a.nombre AS nombre_alumno, p.nombre AS nombre_plan
   FROM cuotas c
   JOIN alumno a ON c.id_alumno = a.id_alumno
@@ -520,7 +516,7 @@ BEGIN
     LIMIT 1;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerInscripciones` ()   BEGIN
+ CREATE PROCEDURE `ObtenerInscripciones` ()   BEGIN
     SELECT 
         ca.id_alumno, a.nombre AS nombre_alumno,
         ca.id_clase, n.nombre AS nivel, d.nombre AS dia,
@@ -532,7 +528,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerInscripciones` ()   BEGIN
     JOIN dias d ON c.id_dia = d.id_dia;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `obtenerMensajes` (IN `n_id_alumno` INT, IN `n_validation` VARCHAR(255))   BEGIN
+ CREATE PROCEDURE `obtenerMensajes` (IN `n_id_alumno` INT, IN `n_validation` VARCHAR(255))   BEGIN
     -- Crear tabla temporal para almacenar mensajes combinados
     CREATE TEMPORARY TABLE IF NOT EXISTS MixMensajes (
         id_mensaje INT,
@@ -604,11 +600,11 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `obtenerMensajes` (IN `n_id_alumno` 
     DROP TEMPORARY TABLE IF EXISTS MixMensajes;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerNiveles` ()   BEGIN
+ CREATE PROCEDURE `ObtenerNiveles` ()   BEGIN
   SELECT * FROM niveles WHERE activo = 1;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerNotas` (IN `p_id_alumno` INT, IN `p_ciclo_lectivo` INT)   BEGIN
+ CREATE PROCEDURE `ObtenerNotas` (IN `p_id_alumno` INT, IN `p_ciclo_lectivo` INT)   BEGIN
 IF p_id_alumno IS NULL OR p_ciclo_lectivo IS NULL THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Parámetros inválidos';
 END IF;
@@ -630,16 +626,16 @@ END IF;
         p.nombre, t.nombre;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerPeriodos` ()   BEGIN
+ CREATE PROCEDURE `ObtenerPeriodos` ()   BEGIN
     SELECT id_periodo, nombre
     FROM periodos WHERE activo = 1;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerPlanes` ()   BEGIN
+ CREATE PROCEDURE `ObtenerPlanes` ()   BEGIN
   SELECT * FROM planes WHERE activa = TRUE;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerResumenAsistenciasAlumno` (IN `p_id_alumno` INT)   BEGIN
+ CREATE PROCEDURE `ObtenerResumenAsistenciasAlumno` (IN `p_id_alumno` INT)   BEGIN
   SELECT 
     COUNT(*) AS total_clases,
     SUM(presente = 1) AS total_presentes,
@@ -650,7 +646,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerResumenAsistenciasAlumno` (I
   WHERE id_alumno = p_id_alumno;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerTotalesAsistenciasPorClase` (IN `p_id_clase` INT)   BEGIN
+ CREATE PROCEDURE `ObtenerTotalesAsistenciasPorClase` (IN `p_id_clase` INT)   BEGIN
   SELECT 
     cu.id_alumno,
     a.nombre AS nombre_alumno,
@@ -665,7 +661,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerTotalesAsistenciasPorClase` 
   GROUP BY cu.id_alumno;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerTotalesPorClaseYRango` (IN `p_id_clase` INT, IN `p_fecha_inicio` DATE, IN `p_fecha_fin` DATE)   BEGIN
+ CREATE PROCEDURE `ObtenerTotalesPorClaseYRango` (IN `p_id_clase` INT, IN `p_fecha_inicio` DATE, IN `p_fecha_fin` DATE)   BEGIN
   SELECT 
     cu.id_alumno,
     a.nombre AS nombre_alumno,
@@ -681,7 +677,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `ObtenerTotalesPorClaseYRango` (IN `
   GROUP BY cu.id_alumno;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `obtenerUsuarioPorDni` (IN `dni` INT)   BEGIN
+ CREATE PROCEDURE `obtenerUsuarioPorDni` (IN `dni` INT)   BEGIN
     -- Buscar el usuario con el DNI especificado y también obtener el nombre
     SELECT 
         u.id_usuario, 
@@ -703,18 +699,18 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `obtenerUsuarioPorDni` (IN `dni` INT
         a.dni_alumno = dni OR p.dni = dni;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `obtenerUsuarios` ()   BEGIN
+ CREATE PROCEDURE `obtenerUsuarios` ()   BEGIN
     SELECT id_usuario, id_alumno, id_profesor, id_rol, password FROM usuario;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `obtenerVideos` ()   SELECT * FROM videos
+ CREATE PROCEDURE `obtenerVideos` ()   SELECT * FROM videos
 ORDER BY videos.id_video DESC$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `obtInformacionPerfil` (IN `n_id_alumno` INT)   SELECT formularios.nombre, formularios.whatsapp, formularios.whatsapp_adulto,formularios.mail FROM formularios JOIN alumno
+ CREATE PROCEDURE `obtInformacionPerfil` (IN `n_id_alumno` INT)   SELECT formularios.nombre, formularios.whatsapp, formularios.whatsapp_adulto,formularios.mail FROM formularios JOIN alumno
 ON alumno.id_alumno = n_id_alumno
 WHERE formularios.nombre = alumno.nombre$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `RegistrarAsistencias` (IN `p_id_clase` INT, IN `p_fecha` DATE, IN `p_asistencias` TEXT)   BEGIN
+ CREATE PROCEDURE `RegistrarAsistencias` (IN `p_id_clase` INT, IN `p_fecha` DATE, IN `p_asistencias` TEXT)   BEGIN
   DECLARE entrada TEXT;
   DECLARE alumno_id INT;
   DECLARE presente_val TINYINT;
@@ -743,7 +739,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `RegistrarAsistencias` (IN `p_id_cla
   END WHILE;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `registrarUsuario` (IN `p_dni` INT, IN `p_password` VARCHAR(255), IN `p_nombre` VARCHAR(255))   BEGIN
+ CREATE PROCEDURE `registrarUsuario` (IN `p_dni` INT, IN `p_password` VARCHAR(255), IN `p_nombre` VARCHAR(255))   BEGIN
     DECLARE hashedPassword VARCHAR(255);
     SET hashedPassword = p_password; 
 
@@ -755,7 +751,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `registrarUsuario` (IN `p_dni` INT, 
     VALUES (LAST_INSERT_ID(), NULL, 4, hashedPassword);
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_obtener_estudiantes` (IN `n_opcion` VARCHAR(255))   BEGIN
+ CREATE PROCEDURE `sp_obtener_estudiantes` (IN `n_opcion` VARCHAR(255))   BEGIN
     IF n_opcion = 'existente' THEN
         SELECT alumno.id_alumno, alumno.nombre 
         FROM alumno
@@ -773,7 +769,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_obtener_estudiantes` (IN `n_opci
     END IF;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `subirFormulario` (IN `n_programa` VARCHAR(255), IN `n_conoce_por` VARCHAR(255), IN `n_nombre` VARCHAR(255), IN `n_dni` INT, IN `n_fecha_nacimiento` DATE, IN `n_whatsapp` VARCHAR(255), IN `n_nombre_adulto` VARCHAR(255), IN `n_whatsapp_adulto` VARCHAR(255), IN `n_calle` VARCHAR(255), IN `n_barrio` VARCHAR(255), IN `n_ciudad` VARCHAR(255), IN `n_estado_provincia` VARCHAR(255), IN `n_codigo_postal` VARCHAR(10), IN `n_mail` VARCHAR(255), IN `n_ocupacion` VARCHAR(255), IN `n_horarios_disponibles` TEXT, IN `n_nivel_estudio` VARCHAR(255), IN `n_pago` VARCHAR(255), IN `n_afeccion` TEXT, IN `n_id_usuario` INT)   INSERT INTO formularios (
+ CREATE PROCEDURE `subirFormulario` (IN `n_programa` VARCHAR(255), IN `n_conoce_por` VARCHAR(255), IN `n_nombre` VARCHAR(255), IN `n_dni` INT, IN `n_fecha_nacimiento` DATE, IN `n_whatsapp` VARCHAR(255), IN `n_nombre_adulto` VARCHAR(255), IN `n_whatsapp_adulto` VARCHAR(255), IN `n_calle` VARCHAR(255), IN `n_barrio` VARCHAR(255), IN `n_ciudad` VARCHAR(255), IN `n_estado_provincia` VARCHAR(255), IN `n_codigo_postal` VARCHAR(10), IN `n_mail` VARCHAR(255), IN `n_ocupacion` VARCHAR(255), IN `n_horarios_disponibles` TEXT, IN `n_nivel_estudio` VARCHAR(255), IN `n_pago` VARCHAR(255), IN `n_afeccion` TEXT, IN `n_id_usuario` INT)   INSERT INTO formularios (
         programa, conoce_por, nombre, dni,  fecha_nacimiento, whatsapp,
         nombre_adulto,  whatsapp_adulto, calle, barrio, ciudad,
         estado_provincia, codigo_postal, mail, ocupacion, horarios_disponibles,
@@ -786,7 +782,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `subirFormulario` (IN `n_programa` V
         n_nivel_estudio, n_pago, n_afeccion, n_id_usuario
     )$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `SubirMensaje` (IN `n_id_alumno` INT, IN `n_mensaje` VARCHAR(255))   BEGIN
+ CREATE PROCEDURE `SubirMensaje` (IN `n_id_alumno` INT, IN `n_mensaje` VARCHAR(255))   BEGIN
     IF n_mensaje IS NULL OR n_mensaje = '' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'El mensaje no puede estar vacío';
@@ -796,7 +792,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `SubirMensaje` (IN `n_id_alumno` INT
     VALUES (n_id_alumno, n_mensaje, CURRENT_TIMESTAMP);
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `SubirMensajeClase` (IN `p_id_clase` INT, IN `p_mensaje` VARCHAR(255))   BEGIN
+ CREATE PROCEDURE `SubirMensajeClase` (IN `p_id_clase` INT, IN `p_mensaje` VARCHAR(255))   BEGIN
   IF p_mensaje IS NULL OR p_mensaje = '' THEN
     SIGNAL SQLSTATE '45000'
     SET MESSAGE_TEXT = 'El mensaje no puede estar vacío';
@@ -809,7 +805,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `SubirMensajeClase` (IN `p_id_clase`
   WHERE ca.id_clase = p_id_clase;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `SubirMensajeCurso` (IN `n_id_nivel` INT, IN `n_mensaje` VARCHAR(255))   BEGIN
+ CREATE PROCEDURE `SubirMensajeCurso` (IN `n_id_nivel` INT, IN `n_mensaje` VARCHAR(255))   BEGIN
     IF n_mensaje IS NULL OR n_mensaje = '' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'El mensaje no puede estar vacío';
@@ -819,12 +815,12 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `SubirMensajeCurso` (IN `n_id_nivel`
     VALUES (n_id_nivel, n_mensaje, CURRENT_TIMESTAMP);
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `SubirMensajeTodos` (IN `n_mensaje` TEXT)   BEGIN
+ CREATE PROCEDURE `SubirMensajeTodos` (IN `n_mensaje` TEXT)   BEGIN
     INSERT INTO mensajes (mensaje, id_alumno, id_nivel, createdAt)
     VALUES (n_mensaje, NULL, NULL, NOW());
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `SubirNota` (IN `p_id_alumno` INT, IN `p_id_periodo` INT, IN `p_id_tipo_nota` INT, IN `p_nota` DECIMAL(5,2), IN `p_ciclo_lectivo` INT)   BEGIN
+ CREATE PROCEDURE `SubirNota` (IN `p_id_alumno` INT, IN `p_id_periodo` INT, IN `p_id_tipo_nota` INT, IN `p_nota` DECIMAL(5,2), IN `p_ciclo_lectivo` INT)   BEGIN
     -- Verificar si ya existe una nota para el mismo alumno, periodo, tipo de nota y ciclo lectivo
     IF EXISTS (
         SELECT 1 
@@ -848,10 +844,10 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `SubirNota` (IN `p_id_alumno` INT, I
     END IF;
 END$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `subirVideo` (IN `n_titulo` VARCHAR(255), IN `n_idioma` VARCHAR(255), IN `n_url` VARCHAR(255))   INSERT INTO videos(titulo,idioma,url)
+ CREATE PROCEDURE `subirVideo` (IN `n_titulo` VARCHAR(255), IN `n_idioma` VARCHAR(255), IN `n_url` VARCHAR(255))   INSERT INTO videos(titulo,idioma,url)
 VALUES (n_titulo, n_idioma, n_url)$$
 
-CREATE DEFINER=`root`@`localhost` PROCEDURE `VerificarCuotasVigentes` (IN `p_id_alumno` INT, IN `p_fecha` DATE)   BEGIN
+ CREATE PROCEDURE `VerificarCuotasVigentes` (IN `p_id_alumno` INT, IN `p_fecha` DATE)   BEGIN
     -- Declarar variable para contar resultados
     DECLARE v_count INT DEFAULT 0;
     
@@ -1667,7 +1663,15 @@ CREATE TABLE `usuario` (
   `password` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
+
+CREATE TABLE devoluciones (
+    id_usuario INT NOT NULL,
+    id_periodo INT NOT NULL,
+    ciclo_lectivo INT NOT NULL,
+    devolucion TEXT NOT NULL,
+    PRIMARY KEY (id_usuario, id_periodo, ciclo_lectivo),
+    FOREIGN KEY (id_periodo) REFERENCES periodos(id_periodo)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 -- Dumping data for table `usuario`
 --
 
@@ -1741,9 +1745,8 @@ INSERT INTO `videos` (`id_video`, `titulo`, `idioma`, `url`) VALUES
 (4, '505 - Artic Monkeys', 'Ingles', 'https://www.youtube.com/watch?v=qU9mHegkTc4');
 
 --
--- Indexes for dumped tables
---
-
+INSERT INTO devoluciones (id_usuario, id_periodo, ciclo_lectivo, devolucion)
+VALUES (2, 1, 2025, 'Muy buena participación en clase');
 --
 -- Indexes for table `alumno`
 --

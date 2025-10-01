@@ -3,9 +3,14 @@ POST https://inglesback-stx6.onrender.com/api/grades
 Content-Type: application/json
 
 {
-  "idAlumno": 2,
-  "idPeriodo": 1,
-  "idTipoNota": 3,
-  "nota": 8.50,
-  "cicloLectivo": 2025
+  "notas": [
+    {
+      "idAlumno": 2,
+      "idPeriodo": 1,
+      "idTipoNota": 1,
+      "nota": 9.0,
+      "cicloLectivo": 2025,
+      "comentario": "Excelente progreso, pero mejorar la pronunciación."
+    }
+  ]
 }

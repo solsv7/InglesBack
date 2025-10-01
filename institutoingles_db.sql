@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.2
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Jul 23, 2025 at 09:57 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: mysql-institutoingles.alwaysdata.net
+-- Generation Time: Aug 29, 2025 at 12:32 AM
+-- Server version: 10.11.13-MariaDB
+-- PHP Version: 7.4.33
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,14 +18,14 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Database: `instituto_ingles`
+-- Database: `institutoingles_db`
 --
 
 DELIMITER $$
 --
 -- Procedures
 --
- CREATE PROCEDURE `ActualizarClase` (IN `p_id_clase` INT, IN `p_id_dia` INT, IN `p_id_nivel` INT, IN `p_hora_inicio` TIME, IN `p_hora_fin` TIME)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `ActualizarClase` (IN `p_id_clase` INT, IN `p_id_dia` INT, IN `p_id_nivel` INT, IN `p_hora_inicio` TIME, IN `p_hora_fin` TIME)   BEGIN
   UPDATE clases
   SET
     id_dia = p_id_dia,
@@ -35,74 +35,67 @@ DELIMITER $$
   WHERE id_clase = p_id_clase;
 END$$
 
- CREATE PROCEDURE `ActualizarInscripcion` (IN `p_id_alumno` INT, IN `p_id_clase_actual` INT, IN `p_id_clase_nueva` INT)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `ActualizarInscripcion` (IN `p_id_alumno` INT, IN `p_id_clase_actual` INT, IN `p_id_clase_nueva` INT)   BEGIN
     UPDATE clases_alumnos
     SET id_clase = p_id_clase_nueva
     WHERE id_alumno = p_id_alumno AND id_clase = p_id_clase_actual;
 END$$
 
- CREATE PROCEDURE `actualizarNota` (IN `p_id_alumno` INT, IN `p_id_periodo` INT, IN `p_id_tipo_nota` INT, IN `p_nota` DECIMAL(5,2), IN `p_ciclo_lectivo` INT)   BEGIN
-    -- Verificar si ya existe una nota para el mismo alumno, periodo, tipo de nota y ciclo lectivo
-    IF EXISTS (SELECT 1 
-               FROM Notas 
-               WHERE id_alumno = p_id_alumno 
-               AND id_periodo = p_id_periodo 
-               AND id_tipo_nota = p_id_tipo_nota 
-               AND ciclo_lectivo = p_ciclo_lectivo) THEN
-        -- Si existe, actualizar la nota
-        UPDATE Notas
-        SET nota = p_nota
-        WHERE id_alumno = p_id_alumno 
-          AND id_periodo = p_id_periodo 
-          AND id_tipo_nota = p_id_tipo_nota 
-          AND ciclo_lectivo = p_ciclo_lectivo;
-    ELSE
-        -- Si no existe, insertar la nueva nota
-        INSERT INTO Notas (id_alumno, id_periodo, id_tipo_nota, nota, ciclo_lectivo)
-        VALUES (p_id_alumno, p_id_periodo, p_id_tipo_nota, p_nota, p_ciclo_lectivo);
-    END IF;
+CREATE DEFINER=`427717`@`%` PROCEDURE `actualizarPerfil` (IN `p_id_usuario` INT, IN `p_whatsapp` VARCHAR(255), IN `p_whatsapp_adulto` VARCHAR(255), IN `p_mail` VARCHAR(255), IN `p_id_foto` INT)   BEGIN
+    DECLARE v_id_perfil INT;
+
+    -- Guardar el id_perfil en una variable
+    SELECT perfil.id_perfil
+    INTO v_id_perfil
+    FROM perfil
+    JOIN usuario 
+        ON perfil.id_alumno = usuario.id_alumno
+        OR perfil.id_profesor = usuario.id_profesor
+    WHERE usuario.id_usuario = p_id_usuario
+    LIMIT 1;
+
+    -- Actualizar usando la variable
+    UPDATE perfil
+    SET
+        whatsapp = COALESCE(p_whatsapp, whatsapp),
+        whatsapp_adulto = COALESCE(p_whatsapp_adulto, whatsapp_adulto),
+        mail = COALESCE(p_mail, mail),
+        id_foto = COALESCE(p_id_foto, id_foto)
+    WHERE id_perfil = v_id_perfil;
 END$$
 
- CREATE PROCEDURE `actualizarPerfil` (IN `n_id_alumno` INT, IN `n_id_profesor` INT, IN `n_whatsapp` VARCHAR(255), IN `n_whatsapp_adulto` VARCHAR(255), IN `n_mail` VARCHAR(255), IN `n_id_foto` INT, IN `n_id_perfil` INT)   UPDATE perfil
-    SET
-        whatsapp = COALESCE(n_whatsapp, whatsapp), -- Si `n_whatsapp` es NULL, mantén el valor actual
-        whatsapp_adulto = COALESCE(n_whatsapp_adulto, whatsapp_adulto),
-        mail = COALESCE(n_mail, mail),
-        id_foto = COALESCE(n_id_foto, id_foto)
-    WHERE id_perfil = n_id_perfil$$
-
- CREATE PROCEDURE `actualizar_contrasenia` (IN `p_id_usuario` INT, IN `p_nueva_contrasenia` VARCHAR(255))   BEGIN
-    UPDATE Usuario
+CREATE DEFINER=`427717`@`%` PROCEDURE `actualizar_contrasenia` (IN `p_id_usuario` INT, IN `p_nueva_contrasenia` VARCHAR(255))   BEGIN
+    UPDATE usuario
     SET password = p_nueva_contrasenia
     WHERE id_usuario = p_id_usuario;
 END$$
 
- CREATE PROCEDURE `AgregarNivel` (IN `p_nombre` VARCHAR(100), IN `p_idioma` VARCHAR(50))   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `AgregarNivel` (IN `p_nombre` VARCHAR(100), IN `p_idioma` VARCHAR(50))   BEGIN
   INSERT INTO niveles (nombre, idioma, activo)
   VALUES (p_nombre, p_idioma, 1);
 END$$
 
- CREATE PROCEDURE `crearAlumno` (IN `p_dni` INT, IN `p_nombre` VARCHAR(255), IN `p_password` VARCHAR(255), IN `p_mail` VARCHAR(255), IN `p_whatsapp` VARCHAR(255), IN `p_whatsapp_adulto` VARCHAR(255), OUT `p_id_usuario` INT)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `crearAlumno` (IN `p_dni` INT, IN `p_nombre` VARCHAR(255), IN `p_password` VARCHAR(255), IN `p_mail` VARCHAR(255), IN `p_whatsapp` VARCHAR(255), IN `p_whatsapp_adulto` VARCHAR(255), OUT `p_id_usuario` INT)   BEGIN
     DECLARE p_id_persona INT;
 
     -- Paso 1: Insertar en la tabla Usuario
-    INSERT INTO Usuario (id_alumno, id_profesor, id_rol, password)
+    INSERT INTO usuario (id_alumno, id_profesor, id_rol, password)
     VALUES (NULL, NULL, 3, p_password);
     SET p_id_usuario = LAST_INSERT_ID(); -- Obtener el ID del usuario recién creado
 
     -- Verificar si el alumno ya existe
-    IF NOT EXISTS (SELECT 1 FROM Alumno WHERE dni_alumno = p_dni) THEN
+    IF NOT EXISTS (SELECT 1 FROM alumno WHERE dni_alumno = p_dni) THEN
         -- Insertar un nuevo alumno
-        INSERT INTO Alumno (dni_alumno, nombre, id_clase)
+        INSERT INTO alumno (dni_alumno, nombre, id_clase)
         VALUES (p_dni, p_nombre, NULL);
         SET p_id_persona = LAST_INSERT_ID(); -- Obtener el ID del alumno insertado
     ELSE
         -- Si ya existe, obtener el ID del alumno
-        SET p_id_persona = (SELECT id_alumno FROM Alumno WHERE dni_alumno = p_dni);
+        SET p_id_persona = (SELECT id_alumno FROM alumno WHERE dni_alumno = p_dni);
     END IF;
 
     -- Actualizar la tabla Usuario con el ID del alumno
-    UPDATE Usuario SET id_alumno = p_id_persona WHERE id_usuario = p_id_usuario;
+    UPDATE usuario SET id_alumno = p_id_persona WHERE id_usuario = p_id_usuario;
 
     -- Insertar en la tabla perfil
     INSERT INTO perfil (nombre, whatsapp, whatsapp_adulto, mail, id_alumno)
@@ -110,7 +103,7 @@ END$$
 
 END$$
 
- CREATE PROCEDURE `CrearCuota` (IN `p_id_alumno` INT, IN `p_id_plan` INT, IN `p_fecha_inicio` DATE, IN `p_fecha_vencimiento` DATE)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `CrearCuota` (IN `p_id_alumno` INT, IN `p_id_plan` INT, IN `p_fecha_inicio` DATE, IN `p_fecha_vencimiento` DATE)   BEGIN
   INSERT INTO cuotas (
     id_alumno,
     id_plan,
@@ -127,21 +120,21 @@ END$$
   );
 END$$
 
- CREATE PROCEDURE `CrearPeriodo` (IN `p_nombre` VARCHAR(100))   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `CrearPeriodo` (IN `p_nombre` VARCHAR(100))   BEGIN
     INSERT INTO periodos (nombre, activo)
     VALUES (p_nombre, 1);
 END$$
 
- CREATE PROCEDURE `CrearPlan` (IN `p_nombre` VARCHAR(100), IN `p_descripcion` TEXT, IN `p_monto` DECIMAL(10,2))   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `CrearPlan` (IN `p_nombre` VARCHAR(100), IN `p_descripcion` TEXT, IN `p_monto` DECIMAL(10,2))   BEGIN
   INSERT INTO planes (nombre, descripcion, monto, activa)
   VALUES (p_nombre, p_descripcion, p_monto, TRUE);
 END$$
 
- CREATE PROCEDURE `crearProfesor` (IN `p_dni` INT, IN `p_nombre` VARCHAR(255), IN `p_password` VARCHAR(255), IN `p_mail` VARCHAR(255), OUT `p_id_usuario` INT)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `crearProfesor` (IN `p_dni` INT, IN `p_nombre` VARCHAR(255), IN `p_password` VARCHAR(255), IN `p_mail` VARCHAR(255), OUT `p_id_usuario` INT)   BEGIN
     DECLARE p_id_persona INT;
 
     -- Paso 1: Insertar en la tabla Usuario
-    INSERT INTO Usuario (id_alumno, id_profesor, id_rol, password)
+    INSERT INTO usuario (id_alumno, id_profesor, id_rol, password)
     VALUES (NULL, NULL, 2, p_password);
     SET p_id_usuario = LAST_INSERT_ID(); -- Obtener el ID del usuario recién creado
 
@@ -160,7 +153,7 @@ END$$
     END IF;
 
     -- Actualizar la tabla Usuario con el ID del profesor
-    UPDATE Usuario SET id_profesor = p_id_persona WHERE id_usuario = p_id_usuario;
+    UPDATE usuario SET id_profesor = p_id_persona WHERE id_usuario = p_id_usuario;
 
     -- Insertar en la tabla perfil
     INSERT INTO perfil (nombre, whatsapp, mail, id_profesor)
@@ -168,7 +161,7 @@ END$$
 
 END$$
 
- CREATE PROCEDURE `crearUsuario` (IN `p_dni_alumno` VARCHAR(255), IN `p_nombre` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `crearUsuario` (IN `p_dni_alumno` VARCHAR(255), IN `p_nombre` VARCHAR(255), IN `p_password` VARCHAR(255))   BEGIN
     INSERT INTO usuario (id_alumno, id_profesor, id_rol, usuario.password)
     VALUES (null, null, 4, p_password);
     
@@ -176,80 +169,80 @@ END$$
     VALUES(p_dni_alumno,p_nombre,null);
 END$$
 
- CREATE PROCEDURE `CrearUsuarioConPersona` (IN `p_dni` INT, IN `p_nombre` VARCHAR(255), IN `p_password` VARCHAR(255), IN `p_rol` INT, IN `p_id_clase` INT, OUT `p_id_usuario` INT)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `CrearUsuarioConPersona` (IN `p_dni` INT, IN `p_nombre` VARCHAR(255), IN `p_password` VARCHAR(255), IN `p_rol` INT, IN `p_id_clase` INT, OUT `p_id_usuario` INT)   BEGIN
     DECLARE p_id_persona INT;
 
     -- Paso 1: Insertar en la tabla Usuario
-    INSERT INTO Usuario (id_alumno, id_profesor, id_rol, password)
+    INSERT INTO usuario (id_alumno, id_profesor, id_rol, password)
     VALUES (NULL, NULL, p_rol, p_password);
     SET p_id_usuario = LAST_INSERT_ID(); -- Obtener el ID del usuario recién creado
 
     -- Paso 2: Insertar o actualizar la tabla correspondiente según el rol
     IF p_rol = 2 THEN
         -- Profesor
-        INSERT INTO Profesor (dni, nombre, userId)
+        INSERT INTO profesor (dni, nombre, userId)
         VALUES (p_dni, p_nombre, p_id_usuario);
         SET p_id_persona = LAST_INSERT_ID(); -- Obtener el ID del profesor insertado
 
         -- Actualizar la tabla Usuario con el ID del profesor
-        UPDATE Usuario SET id_profesor = p_id_persona WHERE id_usuario = p_id_usuario;
+        UPDATE usuario SET id_profesor = p_id_persona WHERE id_usuario = p_id_usuario;
 
     ELSEIF p_rol = 3 THEN
         -- Alumno: Verificar si ya existe
-        IF NOT EXISTS (SELECT 1 FROM Alumno WHERE dni_alumno = p_dni) THEN
+        IF NOT EXISTS (SELECT 1 FROM alumno WHERE dni_alumno = p_dni) THEN
             -- Insertar un nuevo alumno
-            INSERT INTO Alumno (dni_alumno, nombre, id_clase)
+            INSERT INTO alumno (dni_alumno, nombre, id_clase)
             VALUES (p_dni, p_nombre, p_id_clase);
             SET p_id_persona = LAST_INSERT_ID(); -- Obtener el ID del alumno insertado
         ELSE
             -- Si ya existe, obtener el ID del alumno
-            SET p_id_persona = (SELECT id_alumno FROM Alumno WHERE dni_alumno = p_dni);
+            SET p_id_persona = (SELECT id_alumno FROM alumno WHERE dni_alumno = p_dni);
         END IF;
 
         -- Actualizar la tabla Usuario con el ID del alumno
-        UPDATE Usuario SET id_alumno = p_id_persona WHERE id_usuario = p_id_usuario;
+        UPDATE usuario SET id_alumno = p_id_persona WHERE id_usuario = p_id_usuario;
     END IF;
 
 END$$
 
- CREATE PROCEDURE `CrearUsuarioConPersona2` (IN `p_dni` INT, IN `p_nombre` VARCHAR(255), IN `p_password` VARCHAR(255), IN `p_rol` INT, IN `p_id_clase` INT, IN `p_mail` VARCHAR(255), IN `p_whatsapp` VARCHAR(255), IN `p_whatsapp_adulto` VARCHAR(255), OUT `p_id_usuario` INT)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `CrearUsuarioConPersona2` (IN `p_dni` INT, IN `p_nombre` VARCHAR(255), IN `p_password` VARCHAR(255), IN `p_rol` INT, IN `p_id_clase` INT, IN `p_mail` VARCHAR(255), IN `p_whatsapp` VARCHAR(255), IN `p_whatsapp_adulto` VARCHAR(255), OUT `p_id_usuario` INT)   BEGIN
     DECLARE p_id_persona INT;
 
     -- Paso 1: Insertar en la tabla Usuario
-    INSERT INTO Usuario (id_alumno, id_profesor, id_rol, password)
+    INSERT INTO usuario (id_alumno, id_profesor, id_rol, password)
     VALUES (NULL, NULL, p_rol, p_password);
     SET p_id_usuario = LAST_INSERT_ID(); -- Obtener el ID del usuario recién creado
 
     -- Paso 2: Insertar o actualizar la tabla correspondiente según el rol
     IF p_rol = 2 THEN
         -- Profesor
-        INSERT INTO Profesor (dni, nombre, userId)
+        INSERT INTO profesor (dni, nombre, userId)
         VALUES (p_dni, p_nombre, p_id_usuario);
         SET p_id_persona = LAST_INSERT_ID(); -- Obtener el ID del profesor insertado
 
         -- Actualizar la tabla Usuario con el ID del profesor
-        UPDATE Usuario SET id_profesor = p_id_persona WHERE id_usuario = p_id_usuario;
+        UPDATE usuario SET id_profesor = p_id_persona WHERE id_usuario = p_id_usuario;
 
     ELSEIF p_rol = 3 THEN
         -- Alumno: Verificar si el ID de clase es válido
-        IF p_id_clase IS NOT NULL AND NOT EXISTS (SELECT 1 FROM Clases WHERE id_clase = p_id_clase) THEN
+        IF p_id_clase IS NOT NULL AND NOT EXISTS (SELECT 1 FROM clases WHERE id_clase = p_id_clase) THEN
             SIGNAL SQLSTATE '45000'
             SET MESSAGE_TEXT = 'El ID de clase proporcionado no existe.';
         END IF;
 
         -- Alumno: Verificar si ya existe
-        IF NOT EXISTS (SELECT 1 FROM Alumno WHERE dni_alumno = p_dni) THEN
+        IF NOT EXISTS (SELECT 1 FROM alumno WHERE dni_alumno = p_dni) THEN
             -- Insertar un nuevo alumno
-            INSERT INTO Alumno (dni_alumno, nombre, id_clase)
+            INSERT INTO alumno (dni_alumno, nombre, id_clase)
             VALUES (p_dni, p_nombre, p_id_clase);
             SET p_id_persona = LAST_INSERT_ID(); -- Obtener el ID del alumno insertado
         ELSE
             -- Si ya existe, obtener el ID del alumno
-            SET p_id_persona = (SELECT id_alumno FROM Alumno WHERE dni_alumno = p_dni);
+            SET p_id_persona = (SELECT id_alumno FROM alumno WHERE dni_alumno = p_dni);
         END IF;
 
         -- Actualizar la tabla Usuario con el ID del alumno
-        UPDATE Usuario SET id_alumno = p_id_persona WHERE id_usuario = p_id_usuario;
+        UPDATE usuario SET id_alumno = p_id_persona WHERE id_usuario = p_id_usuario;
 
         -- Insertar en la tabla perfil
         INSERT INTO perfil (nombre, whatsapp, whatsapp_adulto, mail, id_alumno)
@@ -258,7 +251,7 @@ END$$
 
 END$$
 
- CREATE PROCEDURE `EditarCuota` (IN `p_id_cuota` INT, IN `p_id_plan` VARCHAR(10), IN `p_fecha_inicio` VARCHAR(20), IN `p_fecha_vencimiento` VARCHAR(20), IN `p_estado_pago` VARCHAR(20))   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `EditarCuota` (IN `p_id_cuota` INT, IN `p_id_plan` VARCHAR(10), IN `p_fecha_inicio` VARCHAR(20), IN `p_fecha_vencimiento` VARCHAR(20), IN `p_estado_pago` VARCHAR(20))   BEGIN
   UPDATE cuotas
   SET
     id_plan = COALESCE(NULLIF(p_id_plan, ''), id_plan),
@@ -268,20 +261,20 @@ END$$
   WHERE id_cuota = p_id_cuota;
 END$$
 
- CREATE PROCEDURE `EditarNivel` (IN `p_id_nivel` INT, IN `p_nombre` VARCHAR(100), IN `p_idioma` VARCHAR(50))   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `EditarNivel` (IN `p_id_nivel` INT, IN `p_nombre` VARCHAR(100), IN `p_idioma` VARCHAR(50))   BEGIN
   UPDATE niveles
   SET nombre = p_nombre,
       idioma = p_idioma
   WHERE id_nivel = p_id_nivel;
 END$$
 
- CREATE PROCEDURE `EditarPeriodo` (IN `p_id_periodo` INT, IN `p_nombre` VARCHAR(100))   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `EditarPeriodo` (IN `p_id_periodo` INT, IN `p_nombre` VARCHAR(100))   BEGIN
     UPDATE periodos
     SET nombre = p_nombre
     WHERE id_periodo = p_id_periodo;
 END$$
 
- CREATE PROCEDURE `EditarPlan` (IN `p_id_plan` INT, IN `p_nombre` VARCHAR(100), IN `p_descripcion` TEXT, IN `p_monto` DECIMAL(10,2))   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `EditarPlan` (IN `p_id_plan` INT, IN `p_nombre` VARCHAR(100), IN `p_descripcion` TEXT, IN `p_monto` DECIMAL(10,2))   BEGIN
   UPDATE planes
   SET nombre = COALESCE(p_nombre, nombre),
       descripcion = COALESCE(p_descripcion, descripcion),
@@ -289,7 +282,7 @@ END$$
   WHERE id_plan = p_id_plan;
 END$$
 
- CREATE PROCEDURE `editar_clase` (IN `p_id_clase` INT, IN `p_id_nivel` INT, IN `p_id_dia` INT, IN `p_id_horario` INT)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `editar_clase` (IN `p_id_clase` INT, IN `p_id_nivel` INT, IN `p_id_dia` INT, IN `p_id_horario` INT)   BEGIN
     -- Asegurarse de que la clase existe
     IF NOT EXISTS (SELECT 1 FROM clases WHERE id_clase = p_id_clase) THEN
         SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La clase no existe';
@@ -304,7 +297,7 @@ END$$
     SELECT p_id_clase AS id_clase_actualizada;
 END$$
 
- CREATE PROCEDURE `EliminarClase` (IN `p_id_clase` INT)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `EliminarClase` (IN `p_id_clase` INT)   BEGIN
     -- Verificamos si la clase existe
     IF EXISTS (SELECT 1 FROM clases WHERE id_clase = p_id_clase) THEN
         -- Cambiamos la disponibilidad en lugar de eliminar
@@ -315,39 +308,39 @@ END$$
     END IF;
 END$$
 
- CREATE PROCEDURE `EliminarCuota` (IN `p_id_cuota` INT)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `EliminarCuota` (IN `p_id_cuota` INT)   BEGIN
   DELETE FROM cuotas WHERE id_cuota = p_id_cuota;
 END$$
 
- CREATE PROCEDURE `EliminarInscripcion` (IN `p_id_alumno` INT, IN `p_id_clase` INT)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `EliminarInscripcion` (IN `p_id_alumno` INT, IN `p_id_clase` INT)   BEGIN
     DELETE FROM clases_alumnos
     WHERE id_alumno = p_id_alumno AND id_clase = p_id_clase;
 END$$
 
- CREATE PROCEDURE `EliminarNivel` (IN `p_id_nivel` INT)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `EliminarNivel` (IN `p_id_nivel` INT)   BEGIN
   UPDATE niveles
   SET activo = 0
   WHERE id_nivel = p_id_nivel;
 END$$
 
- CREATE PROCEDURE `EliminarPeriodo` (IN `p_id_periodo` INT)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `EliminarPeriodo` (IN `p_id_periodo` INT)   BEGIN
     UPDATE periodos
     SET activo = 0
     WHERE id_periodo = p_id_periodo;
 END$$
 
- CREATE PROCEDURE `EliminarPlan` (IN `p_id_plan` INT)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `EliminarPlan` (IN `p_id_plan` INT)   BEGIN
   UPDATE planes
   SET activa = FALSE
   WHERE id_plan = p_id_plan;
 END$$
 
- CREATE PROCEDURE `InscribirAlumnoClase` (IN `p_id_alumno` INT, IN `p_id_clase` INT)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `InscribirAlumnoClase` (IN `p_id_alumno` INT, IN `p_id_clase` INT)   BEGIN
     INSERT INTO clases_alumnos (id_alumno, id_clase)
     VALUES (p_id_alumno, p_id_clase);
 END$$
 
- CREATE PROCEDURE `insertar_clase` (IN `p_id_nivel` INT, IN `p_id_dia` INT, IN `p_hora_inicio` TIME, IN `p_hora_fin` TIME)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `insertar_clase` (IN `p_id_nivel` INT, IN `p_id_dia` INT, IN `p_hora_inicio` TIME, IN `p_hora_fin` TIME)   BEGIN
   IF NOT EXISTS (SELECT 1 FROM niveles WHERE id_nivel = p_id_nivel) THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El id_nivel no existe';
   END IF;
@@ -362,7 +355,7 @@ END$$
   SELECT LAST_INSERT_ID() AS id_clase_insertada;
 END$$
 
- CREATE PROCEDURE `ObtenerAlumnosPorClase` (IN `p_id_clase` INT)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `ObtenerAlumnosPorClase` (IN `p_id_clase` INT)   BEGIN
     SELECT 
         a.id_alumno,
         a.nombre AS nombre_alumno
@@ -371,7 +364,7 @@ END$$
     WHERE ca.id_clase = p_id_clase;
 END$$
 
- CREATE PROCEDURE `ObtenerAsistenciasPorClaseYFecha` (IN `p_id_clase` INT, IN `p_fecha` DATE)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `ObtenerAsistenciasPorClaseYFecha` (IN `p_id_clase` INT, IN `p_fecha` DATE)   BEGIN
   SELECT 
     cu.id_alumno,
     a.nombre AS nombre_alumno,
@@ -381,7 +374,7 @@ END$$
   WHERE cu.id_clase = p_id_clase AND cu.fecha = p_fecha;
 END$$
 
- CREATE PROCEDURE `ObtenerAsistenciasPorFechaAlumno` (IN `p_id_alumno` INT, IN `p_fecha` DATE)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `ObtenerAsistenciasPorFechaAlumno` (IN `p_id_alumno` INT, IN `p_fecha` DATE)   BEGIN
   SELECT 
     c.id_clase,
     d.nombre AS dia,
@@ -396,7 +389,7 @@ END$$
   WHERE cu.id_alumno = p_id_alumno AND cu.fecha = p_fecha;
 END$$
 
- CREATE PROCEDURE `ObtenerAsistenciasPorRangoAlumno` (IN `p_id_alumno` INT, IN `p_fecha_inicio` DATE, IN `p_fecha_fin` DATE)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `ObtenerAsistenciasPorRangoAlumno` (IN `p_id_alumno` INT, IN `p_fecha_inicio` DATE, IN `p_fecha_fin` DATE)   BEGIN
   SELECT 
     COUNT(*) AS total_clases,
     SUM(presente = 1) AS total_presentes,
@@ -408,12 +401,12 @@ END$$
     AND fecha BETWEEN p_fecha_inicio AND p_fecha_fin;
 END$$
 
- CREATE PROCEDURE `ObtenerCategorias` ()   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `ObtenerCategorias` ()   BEGIN
     SELECT id_tipo, nombre
     FROM tipo_nota;
 END$$
 
- CREATE PROCEDURE `ObtenerClases` ()   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `ObtenerClases` ()   BEGIN
   SELECT 
     c.id_clase,
     c.id_nivel,
@@ -428,40 +421,34 @@ END$$
   WHERE c.disponible = 1;
 END$$
 
- CREATE PROCEDURE `ObtenerClasesPorFecha` (IN `p_fecha` DATE)   BEGIN
-  DECLARE dia_nombre VARCHAR(20);
-  DECLARE dia_id INT;
+CREATE DEFINER=`427717`@`%` PROCEDURE `ObtenerClasesPorFecha` (IN `p_fecha` DATE)   BEGIN
+    DECLARE dia_nombre VARCHAR(20);
+    DECLARE dia_id INT;
 
-  -- Obtener el nombre del día en español
-  SET dia_nombre = ELT(WEEKDAY(p_fecha) + 1, 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo');
+    -- Obtener el nombre del día según la fecha
+    SET dia_nombre = ELT(WEEKDAY(p_fecha) + 1, 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo');
 
-  -- Obtener el id del día desde la tabla dias
-  SELECT id_dia INTO dia_id
-  FROM dias
-  WHERE nombre = dia_nombre
-  LIMIT 1;
+    -- Buscar el id_dia forzando collation para evitar conflictos
+    SELECT id_dia INTO dia_id
+    FROM dias
+    WHERE nombre COLLATE utf8mb4_general_ci = dia_nombre COLLATE utf8mb4_general_ci;
 
-  -- Devolver las clases correspondientes a ese día
-  SELECT 
-    c.id_clase,
-    d.nombre AS dia,
-    n.nombre AS nivel,
-    c.hora_inicio,
-    c.hora_fin
-  FROM clases c
-  JOIN dias d ON c.id_dia = d.id_dia
-  JOIN niveles n ON c.id_nivel = n.id_nivel
-  WHERE c.id_dia = dia_id AND c.disponible = 1;
+    -- Retornar las clases disponibles para ese día
+    SELECT c.*, d.nombre AS dia_nombre
+    FROM clases c
+    INNER JOIN dias d ON c.id_dia = d.id_dia
+    WHERE c.id_dia = dia_id
+      AND c.disponible = 1;
 END$$
 
- CREATE PROCEDURE `ObtenerCuotas` ()   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `ObtenerCuotas` ()   BEGIN
   SELECT c.*, a.nombre AS nombre_alumno, p.nombre AS nombre_plan
   FROM cuotas c
   JOIN alumno a ON c.id_alumno = a.id_alumno
   JOIN planes p ON c.id_plan = p.id_plan;
 END$$
 
- CREATE PROCEDURE `ObtenerCuotasPendientes` ()   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `ObtenerCuotasPendientes` ()   BEGIN
   SELECT c.*, a.nombre AS nombre_alumno, p.nombre AS nombre_plan
   FROM cuotas c
   JOIN alumno a ON c.id_alumno = a.id_alumno
@@ -469,14 +456,14 @@ END$$
   WHERE c.estado_pago = 'pendiente';
 END$$
 
- CREATE PROCEDURE `ObtenerCuotasPorAlumno` (IN `p_id_alumno` INT)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `ObtenerCuotasPorAlumno` (IN `p_id_alumno` INT)   BEGIN
   SELECT c.*, p.nombre AS nombre_plan
   FROM cuotas c
   JOIN planes p ON c.id_plan = p.id_plan
   WHERE c.id_alumno = p_id_alumno;
 END$$
 
- CREATE PROCEDURE `ObtenerCuotasPorAnio` (IN `anio` INT)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `ObtenerCuotasPorAnio` (IN `anio` INT)   BEGIN
   SELECT 
     c.id_cuota,
     a.nombre AS nombre_alumno,
@@ -490,7 +477,7 @@ END$$
   WHERE YEAR(c.fecha_inicio) = anio;
 END$$
 
- CREATE PROCEDURE `ObtenerCuotasPorRango` (IN `p_desde` DATE, IN `p_hasta` DATE)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `ObtenerCuotasPorRango` (IN `p_desde` DATE, IN `p_hasta` DATE)   BEGIN
   SELECT c.*, a.nombre AS nombre_alumno, p.nombre AS nombre_plan
   FROM cuotas c
   JOIN alumno a ON c.id_alumno = a.id_alumno
@@ -498,19 +485,23 @@ END$$
   WHERE c.fecha_inicio BETWEEN p_desde AND p_hasta;
 END$$
 
- CREATE PROCEDURE `obtenerInfoPerfil` (IN `p_id_alumno` INT, IN `p_id_profesor` INT)   BEGIN
-    IF p_id_alumno IS NULL THEN
-        SELECT perfil.id_perfil,perfil.nombre, perfil.whatsapp, perfil.mail, perfil.id_foto 
-        FROM perfil
-        WHERE p_id_profesor = perfil.id_profesor;
-    ELSE
-        SELECT perfil.id_perfil,perfil.nombre, perfil.whatsapp, perfil.whatsapp_adulto, perfil.mail, perfil.id_foto 
-        FROM perfil
-        WHERE p_id_alumno = perfil.id_alumno;
-    END IF;
+CREATE DEFINER=`427717`@`%` PROCEDURE `obtenerInfoPerfil` (IN `p_id_usuario` INT)   BEGIN
+    SELECT 
+        perfil.id_perfil,
+        perfil.nombre, 
+        perfil.whatsapp, 
+        perfil.whatsapp_adulto,
+        perfil.mail, 
+        perfil.id_foto
+    FROM perfil
+    JOIN usuario 
+        ON perfil.id_alumno = usuario.id_alumno
+        OR perfil.id_profesor = usuario.id_profesor
+    WHERE usuario.id_usuario = p_id_usuario
+    LIMIT 1;
 END$$
 
- CREATE PROCEDURE `ObtenerInscripciones` ()   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `ObtenerInscripciones` ()   BEGIN
     SELECT 
         ca.id_alumno, a.nombre AS nombre_alumno,
         ca.id_clase, n.nombre AS nivel, d.nombre AS dia,
@@ -522,7 +513,7 @@ END$$
     JOIN dias d ON c.id_dia = d.id_dia;
 END$$
 
- CREATE PROCEDURE `obtenerMensajes` (IN `n_id_alumno` INT, IN `n_validation` VARCHAR(255))   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `obtenerMensajes` (IN `n_id_alumno` INT, IN `n_validation` VARCHAR(255))   BEGIN
     -- Crear tabla temporal para almacenar mensajes combinados
     CREATE TEMPORARY TABLE IF NOT EXISTS MixMensajes (
         id_mensaje INT,
@@ -594,11 +585,11 @@ END$$
     DROP TEMPORARY TABLE IF EXISTS MixMensajes;
 END$$
 
- CREATE PROCEDURE `ObtenerNiveles` ()   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `ObtenerNiveles` ()   BEGIN
   SELECT * FROM niveles WHERE activo = 1;
 END$$
 
- CREATE PROCEDURE `ObtenerNotas` (IN `p_id_alumno` INT, IN `p_ciclo_lectivo` INT)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `ObtenerNotas` (IN `p_id_alumno` INT, IN `p_ciclo_lectivo` INT)   BEGIN
 IF p_id_alumno IS NULL OR p_ciclo_lectivo IS NULL THEN
     SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Parámetros inválidos';
 END IF;
@@ -609,27 +600,27 @@ END IF;
         t.nombre AS tipo_nota, 
         n.nota 
     FROM 
-        Notas n
+        notas n
     INNER JOIN 
-        Periodos p ON n.id_periodo = p.id_periodo
+        periodos p ON n.id_periodo = p.id_periodo
     INNER JOIN 
-        Tipo_nota t ON n.id_tipo_nota = t.id_tipo
+        tipo_nota t ON n.id_tipo_nota = t.id_tipo
     WHERE 
         n.id_alumno = p_id_alumno AND n.ciclo_lectivo = p_ciclo_lectivo
     ORDER BY 
         p.nombre, t.nombre;
 END$$
 
- CREATE PROCEDURE `ObtenerPeriodos` ()   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `ObtenerPeriodos` ()   BEGIN
     SELECT id_periodo, nombre
     FROM periodos WHERE activo = 1;
 END$$
 
- CREATE PROCEDURE `ObtenerPlanes` ()   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `ObtenerPlanes` ()   BEGIN
   SELECT * FROM planes WHERE activa = TRUE;
 END$$
 
- CREATE PROCEDURE `ObtenerResumenAsistenciasAlumno` (IN `p_id_alumno` INT)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `ObtenerResumenAsistenciasAlumno` (IN `p_id_alumno` INT)   BEGIN
   SELECT 
     COUNT(*) AS total_clases,
     SUM(presente = 1) AS total_presentes,
@@ -640,7 +631,7 @@ END$$
   WHERE id_alumno = p_id_alumno;
 END$$
 
- CREATE PROCEDURE `ObtenerTotalesAsistenciasPorClase` (IN `p_id_clase` INT)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `ObtenerTotalesAsistenciasPorClase` (IN `p_id_clase` INT)   BEGIN
   SELECT 
     cu.id_alumno,
     a.nombre AS nombre_alumno,
@@ -655,7 +646,7 @@ END$$
   GROUP BY cu.id_alumno;
 END$$
 
- CREATE PROCEDURE `ObtenerTotalesPorClaseYRango` (IN `p_id_clase` INT, IN `p_fecha_inicio` DATE, IN `p_fecha_fin` DATE)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `ObtenerTotalesPorClaseYRango` (IN `p_id_clase` INT, IN `p_fecha_inicio` DATE, IN `p_fecha_fin` DATE)   BEGIN
   SELECT 
     cu.id_alumno,
     a.nombre AS nombre_alumno,
@@ -671,7 +662,7 @@ END$$
   GROUP BY cu.id_alumno;
 END$$
 
- CREATE PROCEDURE `obtenerUsuarioPorDni` (IN `dni` INT)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `obtenerUsuarioPorDni` (IN `dni` INT)   BEGIN
     -- Buscar el usuario con el DNI especificado y también obtener el nombre
     SELECT 
         u.id_usuario, 
@@ -693,18 +684,18 @@ END$$
         a.dni_alumno = dni OR p.dni = dni;
 END$$
 
- CREATE PROCEDURE `obtenerUsuarios` ()   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `obtenerUsuarios` ()   BEGIN
     SELECT id_usuario, id_alumno, id_profesor, id_rol, password FROM usuario;
 END$$
 
- CREATE PROCEDURE `obtenerVideos` ()   SELECT * FROM videos
+CREATE DEFINER=`427717`@`%` PROCEDURE `obtenerVideos` ()   SELECT * FROM videos
 ORDER BY videos.id_video DESC$$
 
- CREATE PROCEDURE `obtInformacionPerfil` (IN `n_id_alumno` INT)   SELECT formularios.nombre, formularios.whatsapp, formularios.whatsapp_adulto,formularios.mail FROM formularios JOIN alumno
+CREATE DEFINER=`427717`@`%` PROCEDURE `obtInformacionPerfil` (IN `n_id_alumno` INT)   SELECT formularios.nombre, formularios.whatsapp, formularios.whatsapp_adulto,formularios.mail FROM formularios JOIN alumno
 ON alumno.id_alumno = n_id_alumno
 WHERE formularios.nombre = alumno.nombre$$
 
- CREATE PROCEDURE `RegistrarAsistencias` (IN `p_id_clase` INT, IN `p_fecha` DATE, IN `p_asistencias` TEXT)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `RegistrarAsistencias` (IN `p_id_clase` INT, IN `p_fecha` DATE, IN `p_asistencias` TEXT)   BEGIN
   DECLARE entrada TEXT;
   DECLARE alumno_id INT;
   DECLARE presente_val TINYINT;
@@ -733,7 +724,7 @@ WHERE formularios.nombre = alumno.nombre$$
   END WHILE;
 END$$
 
- CREATE PROCEDURE `registrarUsuario` (IN `p_dni` INT, IN `p_password` VARCHAR(255), IN `p_nombre` VARCHAR(255))   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `registrarUsuario` (IN `p_dni` INT, IN `p_password` VARCHAR(255), IN `p_nombre` VARCHAR(255))   BEGIN
     DECLARE hashedPassword VARCHAR(255);
     SET hashedPassword = p_password; 
 
@@ -745,7 +736,7 @@ END$$
     VALUES (LAST_INSERT_ID(), NULL, 4, hashedPassword);
 END$$
 
- CREATE PROCEDURE `sp_obtener_estudiantes` (IN `n_opcion` VARCHAR(255))   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `sp_obtener_estudiantes` (IN `n_opcion` VARCHAR(255))   BEGIN
     IF n_opcion = 'existente' THEN
         SELECT alumno.id_alumno, alumno.nombre 
         FROM alumno
@@ -763,7 +754,7 @@ END$$
     END IF;
 END$$
 
- CREATE PROCEDURE `subirFormulario` (IN `n_programa` VARCHAR(255), IN `n_conoce_por` VARCHAR(255), IN `n_nombre` VARCHAR(255), IN `n_dni` INT, IN `n_fecha_nacimiento` DATE, IN `n_whatsapp` VARCHAR(255), IN `n_nombre_adulto` VARCHAR(255), IN `n_whatsapp_adulto` VARCHAR(255), IN `n_calle` VARCHAR(255), IN `n_barrio` VARCHAR(255), IN `n_ciudad` VARCHAR(255), IN `n_estado_provincia` VARCHAR(255), IN `n_codigo_postal` VARCHAR(10), IN `n_mail` VARCHAR(255), IN `n_ocupacion` VARCHAR(255), IN `n_horarios_disponibles` TEXT, IN `n_nivel_estudio` VARCHAR(255), IN `n_pago` VARCHAR(255), IN `n_afeccion` TEXT, IN `n_id_usuario` INT)   INSERT INTO formularios (
+CREATE DEFINER=`427717`@`%` PROCEDURE `subirFormulario` (IN `n_programa` VARCHAR(255), IN `n_conoce_por` VARCHAR(255), IN `n_nombre` VARCHAR(255), IN `n_dni` INT, IN `n_fecha_nacimiento` DATE, IN `n_whatsapp` VARCHAR(255), IN `n_nombre_adulto` VARCHAR(255), IN `n_whatsapp_adulto` VARCHAR(255), IN `n_calle` VARCHAR(255), IN `n_barrio` VARCHAR(255), IN `n_ciudad` VARCHAR(255), IN `n_estado_provincia` VARCHAR(255), IN `n_codigo_postal` VARCHAR(10), IN `n_mail` VARCHAR(255), IN `n_ocupacion` VARCHAR(255), IN `n_horarios_disponibles` TEXT, IN `n_nivel_estudio` VARCHAR(255), IN `n_pago` VARCHAR(255), IN `n_afeccion` TEXT, IN `n_id_usuario` INT)   INSERT INTO formularios (
         programa, conoce_por, nombre, dni,  fecha_nacimiento, whatsapp,
         nombre_adulto,  whatsapp_adulto, calle, barrio, ciudad,
         estado_provincia, codigo_postal, mail, ocupacion, horarios_disponibles,
@@ -776,7 +767,7 @@ END$$
         n_nivel_estudio, n_pago, n_afeccion, n_id_usuario
     )$$
 
- CREATE PROCEDURE `SubirMensaje` (IN `n_id_alumno` INT, IN `n_mensaje` VARCHAR(255))   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `SubirMensaje` (IN `n_id_alumno` INT, IN `n_mensaje` VARCHAR(255))   BEGIN
     IF n_mensaje IS NULL OR n_mensaje = '' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'El mensaje no puede estar vacío';
@@ -786,7 +777,7 @@ END$$
     VALUES (n_id_alumno, n_mensaje, CURRENT_TIMESTAMP);
 END$$
 
- CREATE PROCEDURE `SubirMensajeClase` (IN `p_id_clase` INT, IN `p_mensaje` VARCHAR(255))   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `SubirMensajeClase` (IN `p_id_clase` INT, IN `p_mensaje` VARCHAR(255))   BEGIN
   IF p_mensaje IS NULL OR p_mensaje = '' THEN
     SIGNAL SQLSTATE '45000'
     SET MESSAGE_TEXT = 'El mensaje no puede estar vacío';
@@ -799,7 +790,7 @@ END$$
   WHERE ca.id_clase = p_id_clase;
 END$$
 
- CREATE PROCEDURE `SubirMensajeCurso` (IN `n_id_nivel` INT, IN `n_mensaje` VARCHAR(255))   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `SubirMensajeCurso` (IN `n_id_nivel` INT, IN `n_mensaje` VARCHAR(255))   BEGIN
     IF n_mensaje IS NULL OR n_mensaje = '' THEN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'El mensaje no puede estar vacío';
@@ -809,23 +800,23 @@ END$$
     VALUES (n_id_nivel, n_mensaje, CURRENT_TIMESTAMP);
 END$$
 
- CREATE PROCEDURE `SubirMensajeTodos` (IN `n_mensaje` TEXT)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `SubirMensajeTodos` (IN `n_mensaje` TEXT)   BEGIN
     INSERT INTO mensajes (mensaje, id_alumno, id_nivel, createdAt)
     VALUES (n_mensaje, NULL, NULL, NOW());
 END$$
 
- CREATE PROCEDURE `SubirNota` (IN `p_id_alumno` INT, IN `p_id_periodo` INT, IN `p_id_tipo_nota` INT, IN `p_nota` DECIMAL(5,2), IN `p_ciclo_lectivo` INT)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `SubirNota` (IN `p_id_alumno` INT, IN `p_id_periodo` INT, IN `p_id_tipo_nota` INT, IN `p_nota` DECIMAL(5,2), IN `p_ciclo_lectivo` INT)   BEGIN
     -- Verificar si ya existe una nota para el mismo alumno, periodo, tipo de nota y ciclo lectivo
     IF EXISTS (
         SELECT 1 
-        FROM Notas 
+        FROM notas 
         WHERE id_alumno = p_id_alumno 
           AND id_periodo = p_id_periodo 
           AND id_tipo_nota = p_id_tipo_nota 
           AND ciclo_lectivo = p_ciclo_lectivo
     ) THEN
         -- Si existe, actualizar la nota
-        UPDATE Notas
+        UPDATE notas
         SET nota = p_nota
         WHERE id_alumno = p_id_alumno 
           AND id_periodo = p_id_periodo 
@@ -833,15 +824,15 @@ END$$
           AND ciclo_lectivo = p_ciclo_lectivo;
     ELSE
         -- Si no existe, insertar la nueva nota
-        INSERT INTO Notas (id_alumno, id_periodo, id_tipo_nota, nota, ciclo_lectivo)
+        INSERT INTO notas (id_alumno, id_periodo, id_tipo_nota, nota, ciclo_lectivo)
         VALUES (p_id_alumno, p_id_periodo, p_id_tipo_nota, p_nota, p_ciclo_lectivo);
     END IF;
 END$$
 
- CREATE PROCEDURE `subirVideo` (IN `n_titulo` VARCHAR(255), IN `n_idioma` VARCHAR(255), IN `n_url` VARCHAR(255))   INSERT INTO videos(titulo,idioma,url)
+CREATE DEFINER=`427717`@`%` PROCEDURE `subirVideo` (IN `n_titulo` VARCHAR(255), IN `n_idioma` VARCHAR(255), IN `n_url` VARCHAR(255))   INSERT INTO videos(titulo,idioma,url)
 VALUES (n_titulo, n_idioma, n_url)$$
 
- CREATE PROCEDURE `VerificarCuotasVigentes` (IN `p_id_alumno` INT, IN `p_fecha` DATE)   BEGIN
+CREATE DEFINER=`427717`@`%` PROCEDURE `VerificarCuotasVigentes` (IN `p_id_alumno` INT, IN `p_fecha` DATE)   BEGIN
     -- Declarar variable para contar resultados
     DECLARE v_count INT DEFAULT 0;
     
@@ -1656,386 +1647,6 @@ CREATE TABLE `usuario` (
   `id_rol` int(11) NOT NULL,
   `password` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `usuario`
---
-
-INSERT INTO `usuario` (`id_usuario`, `id_alumno`, `id_profesor`, `id_rol`, `password`) VALUES
-(3, 2, NULL, 3, '$2a$10$Xf.tpdd52C14A6pOpuRQs.jShrB/aOP2Dq.jEIKjL3P6vtvN8Yq42'),
-(4, 3, NULL, 3, '$2a$10$j3CLi3AjQPUEdcb8sZOnGuxdYtIjz/oHkOUq3F.5f7R9bGGDG9Vhe'),
-(26, NULL, 15, 2, 'password123'),
-(27, NULL, 16, 2, '$2a$10$uPZHRUvII9UjnvqF/lvovempgBL2NNm/UKAoNokKWtCoUwYyu4JQG'),
-(28, NULL, NULL, 3, '$2a$10$6wNo.Kw7M3Z12UoshIqmPOVMWBpl5KitbYUPW1dwqPICV7o2pvriG'),
-(29, NULL, NULL, 3, '$2a$10$VhCgq8D54k714FD3W753.uHoXkPaloKpnlVxncNmbg3rIrokAdkRO'),
-(30, NULL, NULL, 3, '$2a$10$0N/G5HjyKLBTsav7teo4tOYOPwrfl5Kr1SpmgboABdSRWh0/dJdqa'),
-(31, NULL, NULL, 3, '$2a$10$Cp4SamwT0DQFH7qCQ36dWeKFga9vKd0CPUKom797WXFJj7aJfFpG2'),
-(32, NULL, 17, 2, '$2a$10$662h7xHyQIaTCzd1lD21FOcdWj0WNRTR1gAMrytU9oowTP.Gpl2yW'),
-(33, NULL, 18, 2, '$2a$10$0PEEiwe3ev5j8jNBlF4x2OzLK9QGO6FhPjMWWpxzH.qgGGP8Z.9lK'),
-(34, NULL, NULL, 3, '$2a$10$q8vZEFZp9ijSxOxfnzM4DuSDJUAeh14LosyheYRK6935S1OCxB3hi'),
-(35, NULL, NULL, 3, '$2a$10$NJ/IHHSQRImGzO.9jG76FudIelgJaxDB0qP0Q43mvpVGiR.W6dNs2'),
-(36, NULL, NULL, 3, '$2a$10$5.uCXfLCLFYYdRVKD.mx0e2kFzuGGWa1eJQHIkxQAa1cyYj/qVm7.'),
-(37, NULL, NULL, 3, '$2a$10$lOZ48S9/KugrpLs5Md.1JOQOS7qT/.AMXBJZjkSVZY1Ush6Olf0tW'),
-(38, NULL, NULL, 3, '$2a$10$zv/l0X8k9u/ct4WhOrftiuAqwIcyXCRMeYmwzjNtF4N45hFj8jduC'),
-(39, NULL, NULL, 3, '$2a$10$blE3TCG1.Z4lDJDvvNj2Tu5pYULx9d0O/Jjl0DteAT7VayQBHRNSi'),
-(40, NULL, 19, 2, '$2a$10$rviN/sjBCGgLUz7h1xGWe.xmLNVsOBtQcRdpd0G8yAsTGFu9NCSIm'),
-(41, NULL, NULL, 3, '$2a$10$cIGzp6RbnM32Q3GkDhHiuOmlwgqRVH7Rri1ivOORvaz0tfEZh.ypa'),
-(42, NULL, NULL, 3, '$2a$10$yQviARg4DRk2TBQFLtcoRO8Yfq.B8djHUaJk.qf3dU51dfjz0X2C6'),
-(43, NULL, 20, 2, '$2a$10$pmenv7IbHWQdpIusPw5lseeZzsBT1M3br7csc0TLrA1FV3M7iGwqa'),
-(44, NULL, NULL, 3, '$2a$10$p8vwdvdptr9B9EZzBeTWjOW.ipSfgz7nTy7bkB3uypShckOtDWDuG'),
-(45, NULL, NULL, 3, '$2a$10$810fpD09XfJtXIJyTse8eOl0zQxYC0my7hM.L7x87U0X4nIPHaEQC'),
-(46, NULL, NULL, 3, '$2a$10$z/h9MDIs4Nout4.EytrfpO.ojFDD0VsT0LsEXQSvikDruzICVtjxm'),
-(47, NULL, NULL, 3, '$2a$10$QSKh2PchZcsPCNQFXur/8ut9HnTNjBF/kO2Q51JmL.e0rOrb3k7R2'),
-(48, NULL, NULL, 3, '$2a$10$pYhUvwSusJa4sHfSn0kfpug.AEDgf6WD9olzctR4CeJ4sWuPOhYKS'),
-(49, NULL, NULL, 3, '$2a$10$t9speKV9QutPGeSGJaCGWe1jAUDXlpXDACN8GbexLRBRIb7kuNmz2'),
-(50, NULL, NULL, 3, '$2a$10$Uqaok8jh82f4AUAhyOB.LeHAVs3ALzAS/D.AFbiHaAv9N10X8blha'),
-(51, NULL, NULL, 3, '$2a$10$kS8jSxFKv8AbEJOsKHFVVegHQdHclg6IVdxd./fI.NM58iiewKFaa'),
-(52, 24, NULL, 3, '$2a$10$JfkWm4ILW/TH.pRl/JC02ugpNeKfsrPFujDV4pIbweYVhiQp27RX.'),
-(53, 25, NULL, 3, '$2a$10$0vTXizochSgNApzuHFWQmeUZEz9.enCN8jTO6PgX95T6anrBbMWYW'),
-(54, NULL, 21, 2, '$2a$10$AF.yTfEsuZwlyBRi9dfQ.OJO8NZvbI4vtljaZDVRUn5nObdyH8fz.'),
-(55, 26, NULL, 3, '$2a$10$g2zHvMR2tRPMT.Lxok7IjulNd0vHApYW8DO2zdhPM3LRiV52E660e'),
-(56, 27, NULL, 3, '$2a$10$E6Hu8L2zO1Bc/F2kuyhh/uQvVw2MQLZJy/fOjLBGF.oGaCZy18i2q'),
-(57, 27, NULL, 3, '$2a$10$7iGLTlgtUsk5abJky/0S0.2MTJ1BwcQQtOnmaswaN1BAIZkTCfteS'),
-(58, NULL, NULL, 3, '$2a$10$Qf15VcPEV1y.6Wmou0Ac6.//INEigOB1USNaUWwEEqGQSCaDSEjQe'),
-(59, NULL, NULL, 3, '$2a$10$ajJpDZVuhVOCfet.yyBnGO3kFQJM55ifhPMc4yHH7GOcE34YyzHPu'),
-(60, NULL, NULL, 3, '$2a$10$Xm42ANb2/9MJtN569qsmleaLkQfH/D0Oaldcb4uTxuT7dOme6ofTq'),
-(61, NULL, NULL, 3, '$2a$10$24KNMxvjFU99z36SQcM8re/iu3go.K7QCOZs3HmoUu3GOOLsJeUlK'),
-(62, NULL, NULL, 3, '$2a$10$G/XcYTDjg5QKmH/yjCudjOs11woLf7w5bh9EcQRFbn4QEPJGd78k6'),
-(63, 29, NULL, 3, '$2a$10$fuIvJXI..FzagkqcV2UjiO1hj4rXeJZ4x.FYV3m62TF3iTGHArlK.'),
-(64, NULL, NULL, 2, '$2a$10$PwJ5Fhhl7jRiT5joLDzV6.21Oq3fdGkk7q7p2JxAqIrTz57o6yhBi'),
-(65, NULL, 23, 2, '$2a$10$xhXJ1GfGr4IVw5UxsM.eXOeh3jYXbS9YSGB1e9mLcLrBVlBnn7xb.'),
-(66, 30, NULL, 3, '$2a$10$2foiw5fh364WPc11DIElGe0t3TKU59vIiYDkFtyx5Y179/IDaQFwW'),
-(67, NULL, NULL, 4, '$2a$10$0aBSKVHWs.cJCJWRtz1R4Or8/pZSS0RKGGYkgxZaApxg.QxpUrJ8u'),
-(68, NULL, NULL, 4, '$2a$10$nJ9qhq7rYoL897lFyGHBeudAK0aP92i84hs4ew6ikr4hMCboGl9KG'),
-(69, NULL, NULL, 4, '$2a$10$HVH.pzslRBCiCDnAt6HOduWwtV/whXQnC8hTxGzel31kFRxVhH3su'),
-(71, 32, NULL, 4, '$2a$10$0Gv2DY5/EAWVsuBcKwGdL.w2qOqT3POuOwfeWaMpKP2iQQt458x.G');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `videos`
---
-
-CREATE TABLE `videos` (
-  `id_video` int(11) NOT NULL,
-  `titulo` varchar(255) NOT NULL,
-  `idioma` varchar(255) NOT NULL,
-  `url` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `videos`
---
-
-INSERT INTO `videos` (`id_video`, `titulo`, `idioma`, `url`) VALUES
-(4, '505 - Artic Monkeys', 'Ingles', 'https://www.youtube.com/watch?v=qU9mHegkTc4');
-
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `alumno`
---
-ALTER TABLE `alumno`
-  ADD PRIMARY KEY (`id_alumno`),
-  ADD UNIQUE KEY `dni_alumno` (`dni_alumno`),
-  ADD KEY `id_clase` (`id_clase`);
-
---
--- Indexes for table `asistencia`
---
-ALTER TABLE `asistencia`
-  ADD PRIMARY KEY (`id_asistencia`),
-  ADD KEY `id_alumno` (`id_alumno`);
-
---
--- Indexes for table `clases`
---
-ALTER TABLE `clases`
-  ADD PRIMARY KEY (`id_clase`),
-  ADD KEY `id_nivel` (`id_nivel`),
-  ADD KEY `id_dia` (`id_dia`);
-
---
--- Indexes for table `clases_alumnos`
---
-ALTER TABLE `clases_alumnos`
-  ADD PRIMARY KEY (`id_alumno`,`id_clase`),
-  ADD KEY `id_clase` (`id_clase`);
-
---
--- Indexes for table `clases_usuarios`
---
-ALTER TABLE `clases_usuarios`
-  ADD PRIMARY KEY (`id_alumno`,`id_clase`,`fecha`),
-  ADD KEY `id_clase` (`id_clase`);
-
---
--- Indexes for table `cuotas`
---
-ALTER TABLE `cuotas`
-  ADD PRIMARY KEY (`id_cuota`),
-  ADD KEY `id_alumno` (`id_alumno`),
-  ADD KEY `id_plan` (`id_plan`);
-
---
--- Indexes for table `dias`
---
-ALTER TABLE `dias`
-  ADD PRIMARY KEY (`id_dia`);
-
---
--- Indexes for table `formularios`
---
-ALTER TABLE `formularios`
-  ADD PRIMARY KEY (`id_formulario`);
-
---
--- Indexes for table `mensajes`
---
-ALTER TABLE `mensajes`
-  ADD PRIMARY KEY (`id_mensaje`);
-
---
--- Indexes for table `niveles`
---
-ALTER TABLE `niveles`
-  ADD PRIMARY KEY (`id_nivel`);
-
---
--- Indexes for table `notas`
---
-ALTER TABLE `notas`
-  ADD PRIMARY KEY (`id_nota`),
-  ADD KEY `id_alumno` (`id_alumno`),
-  ADD KEY `id_periodo` (`id_periodo`),
-  ADD KEY `id_tipo_nota` (`id_tipo_nota`);
-
---
--- Indexes for table `perfil`
---
-ALTER TABLE `perfil`
-  ADD PRIMARY KEY (`id_perfil`);
-
---
--- Indexes for table `periodos`
---
-ALTER TABLE `periodos`
-  ADD PRIMARY KEY (`id_periodo`);
-
---
--- Indexes for table `planes`
---
-ALTER TABLE `planes`
-  ADD PRIMARY KEY (`id_plan`);
-
---
--- Indexes for table `profesor`
---
-ALTER TABLE `profesor`
-  ADD PRIMARY KEY (`id_profesor`),
-  ADD UNIQUE KEY `dni` (`dni`),
-  ADD KEY `profesor_userId_foreign_idx` (`userId`);
-
---
--- Indexes for table `roles`
---
-ALTER TABLE `roles`
-  ADD PRIMARY KEY (`id_rol`);
-
---
--- Indexes for table `tipo_nota`
---
-ALTER TABLE `tipo_nota`
-  ADD PRIMARY KEY (`id_tipo`);
-
---
--- Indexes for table `usuario`
---
-ALTER TABLE `usuario`
-  ADD PRIMARY KEY (`id_usuario`),
-  ADD KEY `id_alumno` (`id_alumno`),
-  ADD KEY `id_profesor` (`id_profesor`),
-  ADD KEY `id_rol` (`id_rol`);
-
---
--- Indexes for table `videos`
---
-ALTER TABLE `videos`
-  ADD PRIMARY KEY (`id_video`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `alumno`
---
-ALTER TABLE `alumno`
-  MODIFY `id_alumno` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
-
---
--- AUTO_INCREMENT for table `asistencia`
---
-ALTER TABLE `asistencia`
-  MODIFY `id_asistencia` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `clases`
---
-ALTER TABLE `clases`
-  MODIFY `id_clase` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
---
--- AUTO_INCREMENT for table `cuotas`
---
-ALTER TABLE `cuotas`
-  MODIFY `id_cuota` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
-
---
--- AUTO_INCREMENT for table `dias`
---
-ALTER TABLE `dias`
-  MODIFY `id_dia` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT for table `formularios`
---
-ALTER TABLE `formularios`
-  MODIFY `id_formulario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
-
---
--- AUTO_INCREMENT for table `mensajes`
---
-ALTER TABLE `mensajes`
-  MODIFY `id_mensaje` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
-
---
--- AUTO_INCREMENT for table `niveles`
---
-ALTER TABLE `niveles`
-  MODIFY `id_nivel` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
-
---
--- AUTO_INCREMENT for table `notas`
---
-ALTER TABLE `notas`
-  MODIFY `id_nota` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=246;
-
---
--- AUTO_INCREMENT for table `perfil`
---
-ALTER TABLE `perfil`
-  MODIFY `id_perfil` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT for table `periodos`
---
-ALTER TABLE `periodos`
-  MODIFY `id_periodo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
---
--- AUTO_INCREMENT for table `planes`
---
-ALTER TABLE `planes`
-  MODIFY `id_plan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT for table `profesor`
---
-ALTER TABLE `profesor`
-  MODIFY `id_profesor` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
-
---
--- AUTO_INCREMENT for table `roles`
---
-ALTER TABLE `roles`
-  MODIFY `id_rol` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT for table `tipo_nota`
---
-ALTER TABLE `tipo_nota`
-  MODIFY `id_tipo` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT for table `usuario`
---
-ALTER TABLE `usuario`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=72;
-
---
--- AUTO_INCREMENT for table `videos`
---
-ALTER TABLE `videos`
-  MODIFY `id_video` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `alumno`
---
-ALTER TABLE `alumno`
-  ADD CONSTRAINT `alumno_ibfk_1` FOREIGN KEY (`id_clase`) REFERENCES `clases` (`id_clase`);
-
---
--- Constraints for table `asistencia`
---
-ALTER TABLE `asistencia`
-  ADD CONSTRAINT `asistencia_ibfk_1` FOREIGN KEY (`id_alumno`) REFERENCES `alumno` (`id_alumno`);
-
---
--- Constraints for table `clases`
---
-ALTER TABLE `clases`
-  ADD CONSTRAINT `clases_ibfk_1` FOREIGN KEY (`id_nivel`) REFERENCES `niveles` (`id_nivel`),
-  ADD CONSTRAINT `clases_ibfk_2` FOREIGN KEY (`id_dia`) REFERENCES `dias` (`id_dia`);
-
---
--- Constraints for table `clases_alumnos`
---
-ALTER TABLE `clases_alumnos`
-  ADD CONSTRAINT `clases_alumnos_ibfk_1` FOREIGN KEY (`id_alumno`) REFERENCES `alumno` (`id_alumno`),
-  ADD CONSTRAINT `clases_alumnos_ibfk_2` FOREIGN KEY (`id_clase`) REFERENCES `clases` (`id_clase`);
-
---
--- Constraints for table `clases_usuarios`
---
-ALTER TABLE `clases_usuarios`
-  ADD CONSTRAINT `clases_usuarios_ibfk_1` FOREIGN KEY (`id_alumno`) REFERENCES `alumno` (`id_alumno`),
-  ADD CONSTRAINT `clases_usuarios_ibfk_2` FOREIGN KEY (`id_clase`) REFERENCES `clases` (`id_clase`);
-
---
--- Constraints for table `cuotas`
---
-ALTER TABLE `cuotas`
-  ADD CONSTRAINT `cuotas_ibfk_1` FOREIGN KEY (`id_alumno`) REFERENCES `alumno` (`id_alumno`),
-  ADD CONSTRAINT `cuotas_ibfk_2` FOREIGN KEY (`id_plan`) REFERENCES `planes` (`id_plan`);
-
---
--- Constraints for table `notas`
---
-ALTER TABLE `notas`
-  ADD CONSTRAINT `notas_ibfk_1` FOREIGN KEY (`id_alumno`) REFERENCES `alumno` (`id_alumno`),
-  ADD CONSTRAINT `notas_ibfk_2` FOREIGN KEY (`id_periodo`) REFERENCES `periodos` (`id_periodo`),
-  ADD CONSTRAINT `notas_ibfk_3` FOREIGN KEY (`id_tipo_nota`) REFERENCES `tipo_nota` (`id_tipo`);
-
---
--- Constraints for table `profesor`
---
-ALTER TABLE `profesor`
-  ADD CONSTRAINT `profesor_userId_foreign_idx` FOREIGN KEY (`userId`) REFERENCES `usuario` (`id_usuario`);
-
---
--- Constraints for table `usuario`
---
-ALTER TABLE `usuario`
-  ADD CONSTRAINT `usuario_ibfk_1` FOREIGN KEY (`id_alumno`) REFERENCES `alumno` (`id_alumno`),
-  ADD CONSTRAINT `usuario_ibfk_2` FOREIGN KEY (`id_profesor`) REFERENCES `profesor` (`id_profesor`),
-  ADD CONSTRAINT `usuario_ibfk_3` FOREIGN KEY (`id_rol`) REFERENCES `roles` (`id_rol`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

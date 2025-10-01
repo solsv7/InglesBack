@@ -1,20 +1,32 @@
 const sequelize = require('../config/database'); 
 
+const sequelize = require('../config/database'); 
+
+// Subir nota (con soporte para comentario)
 async function subirNota(req, res) {
     const { notas } = req.body; // Esperamos un arreglo de notas
 
     try {
         for (const nota of notas) {
-            const { idAlumno, idPeriodo, idTipoNota, nota: valorNota, cicloLectivo } = nota;
+            const { 
+                idAlumno, 
+                idPeriodo, 
+                idTipoNota, 
+                nota: valorNota, 
+                cicloLectivo,
+                comentario // ahora también lo recibimos del body
+            } = nota;
+
             await sequelize.query(
-                'CALL SubirNota(:idAlumno, :idPeriodo, :idTipoNota, :nota, :cicloLectivo)', 
+                'CALL SubirNota(:idAlumno, :idPeriodo, :idTipoNota, :nota, :cicloLectivo, :comentario)', 
                 {
                     replacements: {
                         idAlumno,
                         idPeriodo,
                         idTipoNota,
                         nota: valorNota,
-                        cicloLectivo
+                        cicloLectivo,
+                        comentario: comentario || null // si no viene, se manda NULL
                     },
                     type: sequelize.QueryTypes.RAW
                 }
@@ -22,13 +34,12 @@ async function subirNota(req, res) {
         }
         res.status(200).json({ message: 'Notas procesadas correctamente.' });
     } catch (error) {
-
         console.error('Error al subir las notas:', error);
         res.status(500).json({ error: 'Error al subir las notas.' });
     }
 }
 
-
+// Obtener notas con comentarios
 async function obtenerNotas(req, res) {
     const { idAlumno, cicloLectivo } = req.params; 
     console.log('Parámetros recibidos de las notas:', { idAlumno, cicloLectivo });
@@ -48,6 +59,7 @@ async function obtenerNotas(req, res) {
         res.status(500).json({ error: 'Error al obtener las notas' });
     }
 }
+
 
 async function actualizarNota(req, res) {
     const { idAlumno, idPeriodo, idTipoNota, nota, cicloLectivo } = req.body;
