@@ -1,7 +1,5 @@
 const sequelize = require('../config/database'); 
 
-const sequelize = require('../config/database'); 
-
 // Subir nota (con soporte para comentario)
 async function subirNota(req, res) {
     const { notas } = req.body; // Esperamos un arreglo de notas
