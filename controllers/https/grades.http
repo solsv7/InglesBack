@@ -33,15 +33,16 @@ Content-Type: application/json
   "notas": [
     {
       "idAlumno": 2,
-      "idPeriodo": 1,
+      "idPeriodo": 4,
       "idTipoNota": 3,
       "nota": 10,
       "cicloLectivo": 2025,
-      "comentario": "Excelente desempeño y participación."
+      "comentario": "Debe reforzar un poco más el writing."
+
     },
     {
       "idAlumno": 2,
-      "idPeriodo": 1,
+      "idPeriodo": 4,
       "idTipoNota": 4,
       "nota": 9,
       "cicloLectivo": 2025,
@@ -72,4 +73,4 @@ Content-Type: application/json
 ###  Obtener notas (con comentarios)
 GET {{host}}/api/grades/2/2025
 
-###
+#
