@@ -1,5 +1,7 @@
-### Probar actualizarNota
-POST https://inglesback-stx6.onrender.com/api/grades
+@host = https://inglesback-stx6.onrender.com
+
+### Subir varias notas sin comentario
+POST {{host}}/api/grades/subir
 Content-Type: application/json
 
 {
@@ -8,9 +10,66 @@ Content-Type: application/json
       "idAlumno": 2,
       "idPeriodo": 1,
       "idTipoNota": 1,
-      "nota": 9.0,
-      "cicloLectivo": 2025,
-      "comentario": "Excelente progreso, pero mejorar la pronunciación."
+      "nota": 8,
+      "cicloLectivo": 2025
+    },
+    {
+      "idAlumno": 2,
+      "idPeriodo": 1,
+      "idTipoNota": 2,
+      "nota": 9,
+      "cicloLectivo": 2025
     }
   ]
 }
+
+###
+
+###  Subir notas con comentario incluido
+POST {{host}}/api/grades/subir
+Content-Type: application/json
+
+{
+  "notas": [
+    {
+      "idAlumno": 2,
+      "idPeriodo": 1,
+      "idTipoNota": 3,
+      "nota": 10,
+      "cicloLectivo": 2025,
+      "comentario": "Excelente desempeño y participación."
+    },
+    {
+      "idAlumno": 2,
+      "idPeriodo": 1,
+      "idTipoNota": 4,
+      "nota": 9,
+      "cicloLectivo": 2025,
+      "comentario": "Debe reforzar un poco más el writing."
+    }
+  ]
+}
+
+###
+
+###  Subir solo comentario (sin nota)
+POST {{host}}/api/grades/subir
+Content-Type: application/json
+
+{
+  "notas": [
+    {
+      "idAlumno": 2,
+      "idPeriodo": 2,
+      "cicloLectivo": 2025,
+      "comentario": "Muy buena evolución en listening y pronunciación."
+    }
+  ]
+}
+
+###
+
+###  Obtener notas (con comentarios)
+GET {{host}}/api/grades/2/2025
+
+###

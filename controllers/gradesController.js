@@ -1,46 +1,46 @@
-const sequelize = require('../config/database'); 
+const sequelize = require('../config/database');
 
-// Subir nota (con soporte para comentario)
+// Subir nota o comentario
 async function subirNota(req, res) {
-    const { notas } = req.body; // Esperamos un arreglo de notas
+    const { notas } = req.body; // arreglo de objetos
 
     try {
         for (const nota of notas) {
-            const { 
-                idAlumno, 
-                idPeriodo, 
-                idTipoNota, 
-                nota: valorNota, 
+            const {
+                idAlumno,
+                idPeriodo,
+                idTipoNota,
+                nota: valorNota,
                 cicloLectivo,
-                comentario // ahora también lo recibimos del body
+                comentario
             } = nota;
 
             await sequelize.query(
-                'CALL SubirNota(:idAlumno, :idPeriodo, :idTipoNota, :nota, :cicloLectivo, :comentario)', 
+                'CALL SubirNota(:idAlumno, :idPeriodo, :idTipoNota, :nota, :cicloLectivo, :comentario)',
                 {
                     replacements: {
                         idAlumno,
                         idPeriodo,
-                        idTipoNota,
-                        nota: valorNota,
+                        idTipoNota: idTipoNota || null, // permite enviar null si no hay nota
+                        nota: valorNota || null,
                         cicloLectivo,
-                        comentario: comentario || null // si no viene, se manda NULL
+                        comentario: comentario || null
                     },
                     type: sequelize.QueryTypes.RAW
                 }
             );
         }
-        res.status(200).json({ message: 'Notas procesadas correctamente.' });
+        res.status(200).json({ message: 'Notas o comentarios procesados correctamente.' });
     } catch (error) {
-        console.error('Error al subir las notas:', error);
-        res.status(500).json({ error: 'Error al subir las notas.' });
+        console.error('Error al subir las notas o comentarios:', error);
+        res.status(500).json({ error: 'Error al subir las notas o comentarios.' });
     }
 }
 
-// Obtener notas con comentarios
+// Obtener notas (con comentarios si existen)
 async function obtenerNotas(req, res) {
-    const { idAlumno, cicloLectivo } = req.params; 
-    console.log('Parámetros recibidos de las notas:', { idAlumno, cicloLectivo });
+    const { idAlumno, cicloLectivo } = req.params;
+    console.log('Parámetros recibidos:', { idAlumno, cicloLectivo });
 
     try {
         const result = await sequelize.query(
@@ -50,55 +50,18 @@ async function obtenerNotas(req, res) {
                 type: sequelize.QueryTypes.RAW,
             }
         );
-        
+
         res.status(200).json(result);
     } catch (error) {
         console.error('Error al obtener las notas:', error);
-        res.status(500).json({ error: 'Error al obtener las notas' });
+        res.status(500).json({ error: 'Error al obtener las notas.' });
     }
 }
 
-
-async function actualizarNota(req, res) {
-    const { idAlumno, idPeriodo, idTipoNota, nota, cicloLectivo } = req.body;
-
-    try {
-        await sequelize.query(
-            'CALL actualizarNota(?, ?, ?, ?, ?)', 
-            {
-                replacements: [idAlumno, idPeriodo, idTipoNota, nota, cicloLectivo],
-                type: sequelize.QueryTypes.RAW
-            }
-        );
-
-        res.status(200).json({ message: 'Nota actualizada correctamente' });
-    } catch (error) {
-        console.error('Error al actualizar la nota:', error);
-        res.status(500).json({ error: 'Error al actualizar la nota' });
-    }
-}
-async function actualizarNota(req, res) {
-    const { idAlumno, idPeriodo, idTipoNota, nota, cicloLectivo } = req.body;
-
-    try {
-        await sequelize.query(
-            'CALL actualizarNota(?, ?, ?, ?, ?)', 
-            {
-                replacements: [idAlumno, idPeriodo, idTipoNota, nota, cicloLectivo],
-                type: sequelize.QueryTypes.RAW
-            }
-        );
-
-        res.status(200).json({ message: 'Nota actualizada correctamente' });
-    } catch (error) {
-        console.error('Error al actualizar la nota:', error);
-        res.status(500).json({ error: 'Error al actualizar la nota' });
-    }
-}
 
 
 module.exports = {
     subirNota,
     obtenerNotas,
-    actualizarNota
+
 };
