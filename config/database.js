@@ -19,5 +19,4 @@ const sequelize = new Sequelize(
   }
 );
 
-console.log('JWT_SECRET:', process.env.JWT_SECRET); 
 module.exports = sequelize;

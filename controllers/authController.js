@@ -3,151 +3,206 @@ const jwt = require('jsonwebtoken');
 const { QueryTypes } = require('sequelize');
 const pool = require('../config/database');
 
-const login = async (req, res) => {
-    const { dni, password } = req.body;
-
-    try {
-        if (!dni || !password) {
-            return res.status(400).json({ message: 'DNI y contraseña son obligatorios.' });
-        }
-
-        console.log("dni recibido", dni);
-        
-        // Llamamos a la base de datos para obtener el usuario por DNI
-        const [user] = await pool.query(`CALL obtenerUsuarioPorDni(?)`, {
-            replacements: [dni],
-            type: QueryTypes.RAW
-        });
+const BCRYPT_SALT_ROUNDS = parseInt(process.env.BCRYPT_SALT_ROUNDS || '12', 10);
 
 
-
-        const usuarioEncontrado = user ? user : null;
-
-        if (!usuarioEncontrado) {
-            console.log("Usuario no encontrado");
-            return res.status(404).json({ message: 'Usuario no encontrado.' });
-        }
-
-        console.log("Usuario encontrado:", usuarioEncontrado);  // Depuración
-
-        // Verificación de la contraseña
-        const hashedPassword = usuarioEncontrado.password;
-        if (!hashedPassword) {
-            return res.status(500).json({ message: 'Contraseña no disponible para el usuario.' });
-        }
-
-
-
-        // Comparar la contraseña con el hash
-        const isMatch = await bcrypt.compare(password, hashedPassword);
-        console.log("¿Contraseñas coinciden?", isMatch);  // Depuración
-
-        if (!isMatch) {
-            return res.status(401).json({ message: 'Contraseña incorrecta.' });
-        }
-
-        // Generar token JWT
-        const token = jwt.sign(
-            { id: usuarioEncontrado.id_usuario, role: usuarioEncontrado.id_rol },
-            process.env.JWT_SECRET,
-            { expiresIn: '1h' }
-        );
-
-        // Responder con el token y datos del usuario
-        return res.json({
-            token,
-            user: {
-                id: usuarioEncontrado.id_usuario,
-                nombre: usuarioEncontrado.nombre_usuario,
-                rol: usuarioEncontrado.id_rol,
-                id_alumno: usuarioEncontrado.id_alumno, // id del estudiante
-                id_profesor: usuarioEncontrado.id_profesor,
-            },
-        });
-    } catch (error) {
-        console.error('Error en el inicio de sesión:', error);
-        return res.status(500).json({ message: 'Error en el inicio de sesión' });
-    }
+const isStrongPassword = (password) => {
+  const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$/;
+  return regex.test(password);
 };
 
+const hashPassword = async (password) => {
+  return bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
+};
 
+const login = async (req, res) => {
+  const { dni, password } = req.body;
+
+  try {
+    if (!dni || !password) {
+      return res.status(400).json({ message: 'DNI y contraseña son obligatorios.' });
+    }
+
+    console.log('dni recibido', dni);
+
+    const [user] = await pool.query(`CALL obtenerUsuarioPorDni(?)`, {
+      replacements: [dni],
+      type: QueryTypes.RAW,
+    });
+
+    const usuarioEncontrado = user ? user : null;
+
+    const invalidMsg = 'DNI o contraseña incorrectos.';
+
+    if (!usuarioEncontrado) {
+      console.log('Usuario no encontrado');
+      return res.status(400).json({ message: invalidMsg });
+    }
+
+
+    const hashedPassword = usuarioEncontrado.password;
+    if (!hashedPassword) {
+      return res
+        .status(500)
+        .json({ message: 'Contraseña no disponible para el usuario.' });
+    }
+
+    const isMatch = await bcrypt.compare(password, hashedPassword);
+    console.log('¿Contraseñas coinciden?', isMatch); // Depuración
+
+    if (!isMatch) {
+      return res.status(400).json({ message: invalidMsg });
+    }
+
+    // Generar token JWT
+    const token = jwt.sign(
+      {
+        id: usuarioEncontrado.id_usuario,
+        role: usuarioEncontrado.id_rol,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+
+    return res.json({
+      token,
+      user: {
+        id: usuarioEncontrado.id_usuario,
+        nombre: usuarioEncontrado.nombre_usuario,
+        rol: usuarioEncontrado.id_rol,
+        id_alumno: usuarioEncontrado.id_alumno,
+        id_profesor: usuarioEncontrado.id_profesor,
+      },
+    });
+  } catch (error) {
+    console.error('Error en el inicio de sesión:', error);
+    return res.status(500).json({ message: 'Error en el inicio de sesión' });
+  }
+};
 
 const registerUser = async (req, res) => {
-    const { dni, password, nombre } = req.body;
+  const { dni, password, nombre } = req.body;
 
-    try {
-        // Verificar si el usuario ya existe
-        const [existingUsers] = await pool.query('CALL obtenerUsuarioPorDNI(?)', {
-            replacements: [dni],
-            type: QueryTypes.RAW,
-        });
-
-        if (existingUsers && existingUsers.length > 0) {
-            return res.status(400).json({ message: 'El usuario ya existe.' });
-        }
-
-        // Hashear la contraseña
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Llamar al procedimiento almacenado para registrar al usuario
-        await pool.query(
-            'CALL registrarUsuario(:dni, :hashedPassword, :nombre);',
-            {
-                replacements: {
-                    dni,
-                    hashedPassword,
-                    nombre,
-                },
-                type: QueryTypes.RAW,
-            }
-        );
-
-        return res.status(201).json({ message: 'Usuario creado' });
-    } catch (error) {
-        console.error('Error al registrar usuario:', error);
-        return res.status(500).json({ message: 'Error al registrar usuario', error: error.message });
+  try {
+    // Validaciones básicas extra de seguridad
+    if (!dni || !password || !nombre) {
+      return res.status(400).json({
+        message: 'DNI, contraseña y nombre son obligatorios.',
+      });
     }
+
+    if (!Number.isInteger(Number(dni))) {
+      return res.status(400).json({
+        message: 'El DNI debe ser un número entero.',
+      });
+    }
+
+    if (!isStrongPassword(password)) {
+      return res.status(400).json({
+        message:
+          'La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, un número y un símbolo.',
+      });
+    }
+
+    const [existingUsers] = await pool.query('CALL obtenerUsuarioPorDNI(?)', {
+      replacements: [dni],
+      type: QueryTypes.RAW,
+    });
+
+    if (existingUsers && existingUsers.length > 0) {
+      return res.status(400).json({ message: 'El usuario ya existe.' });
+    }
+
+    const hashedPassword = await hashPassword(password);
+
+    await pool.query('CALL registrarUsuario(:dni, :hashedPassword, :nombre);', {
+      replacements: {
+        dni,
+        hashedPassword,
+        nombre,
+      },
+      type: QueryTypes.RAW,
+    });
+
+    return res.status(201).json({ message: 'Usuario creado' });
+  } catch (error) {
+    console.error('Error al registrar usuario:', error);
+    return res
+      .status(500)
+      .json({ message: 'Error al registrar usuario', error: error.message });
+  }
 };
 
 const actualizarContrasenia = async (req, res) => {
-    const { dni, nueva_contrasenia } = req.body;
+  const { dni, nueva_contrasenia } = req.body;
 
-    try {
-        // Hashear la nueva contraseña
-        const hashedPassword = await bcrypt.hash(nueva_contrasenia, 10);
-        // Usamos el procedimiento para actualizar la contraseña
-        await pool.query(`CALL actualizarContraseñaUsuario(?, ?)`, {
-            replacements: [dni, hashedPassword],
-            type: QueryTypes.RAW
-        });
-
-        res.status(200).json({ message: 'Contraseña actualizada correctamente.' });
-    } catch (error) {
-        console.error('Error actualizando la contraseña:', error);
-        res.status(500).json({ message: 'Error actualizando la contraseña.' });
+  try {
+    if (!dni || !nueva_contrasenia) {
+      return res
+        .status(400)
+        .json({ message: 'DNI y nueva contraseña son obligatorios.' });
     }
+
+    if (!isStrongPassword(nueva_contrasenia)) {
+      return res.status(400).json({
+        message:
+          'La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, un número y un símbolo.',
+      });
+    }
+
+    const [user] = await pool.query('CALL obtenerUsuarioPorDni(?)', {
+      replacements: [dni],
+      type: QueryTypes.RAW,
+    });
+
+    const usuarioEncontrado = user ? user : null;
+
+    if (!usuarioEncontrado) {
+      return res.status(404).json({ message: 'Usuario no encontrado.' });
+    }
+
+    const hashedPassword = await hashPassword(nueva_contrasenia);
+
+    await pool.query('CALL actualizar_contrasenia(?, ?)', {
+      replacements: [usuarioEncontrado.id_usuario, hashedPassword],
+      type: QueryTypes.RAW,
+    });
+
+    return res
+      .status(200)
+      .json({ message: 'Contraseña actualizada correctamente.' });
+  } catch (error) {
+    console.error('Error actualizando la contraseña:', error);
+    return res
+      .status(500)
+      .json({ message: 'Error actualizando la contraseña.' });
+  }
 };
 
+
 const validarRegistro = async (req, res) => {
-    const { dni, password, nombre } = req.body;
+  const { dni, password, nombre } = req.body;
 
-    // Validaciones básicas
-    if (!dni || !password || !nombre) {
-        return res.status(400).json({ message: 'DNI, contraseña y nombre son obligatorios.' });
-    }
+  if (!dni || !password || !nombre) {
+    return res
+      .status(400)
+      .json({ message: 'DNI, contraseña y nombre son obligatorios.' });
+  }
 
-    // Validar que el DNI es un número entero
-    if (!Number.isInteger(Number(dni))) {
-        return res.status(400).json({ message: 'El DNI debe ser un número entero.' });
-    }
+  if (!Number.isInteger(Number(dni))) {
+    return res
+      .status(400)
+      .json({ message: 'El DNI debe ser un número entero.' });
+  }
 
-    // Validar que la contraseña tiene al menos 6 caracteres
-    if (password.length < 6) {
-        return res.status(400).json({ message: 'La contraseña debe tener al menos 6 caracteres.' });
-    }
+  if (!isStrongPassword(password)) {
+    return res.status(400).json({
+      message:
+        'La contraseña debe tener al menos 8 caracteres, incluir mayúsculas, minúsculas, un número y un símbolo.',
+    });
+  }
 
-
-    return true; // Si todas las validaciones pasan
+  return true; 
 };
 
 module.exports = { login, registerUser, actualizarContrasenia, validarRegistro };

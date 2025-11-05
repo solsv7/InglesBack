@@ -42,3 +42,13 @@ Content-Type: application/json
 
 ### Obtener clases por fecha
 GET http://localhost:3001/api/clases-alumnos/clases-por-fecha?fecha=2025-06-18
+
+
+### Cambiar contraseña 
+PUT http://localhost:3001/api/auth/actualizar-contrasenia
+Content-Type: application/json
+
+{
+  "dni": "41991329",
+  "nueva_contrasenia": ""
+}
