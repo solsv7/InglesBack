@@ -40,7 +40,7 @@ const PORT = process.env.PORT || 3001;
 
 const allowlist = [
   'http://localhost:3000',
-  'https://ingles-front.vercel.app',
+  'https://newinglesfront.vercel.app',
   process.env.FRONTEND_URL 
 ];
 
@@ -98,6 +98,15 @@ app.use('/api/cuotas', cuotasRoutes);
 
 app.get('/api/secure-data', authenticateToken, (req, res) => {
   res.json({ message: 'Datos protegidos', user: req.user });
+});
+
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    message: 'API Instituto Inglés funcionando',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString()
+  });
 });
 
 sequelize.sync()
