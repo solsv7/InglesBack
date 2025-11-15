@@ -104,7 +104,7 @@ const registerUser = async (req, res) => {
       });
     }
 
-    const [existingUsers] = await pool.query('CALL obtenerUsuarioPorDNI(?)', {
+    const [existingUsers] = await pool.query('CALL obtenerUsuarioPorDni(?)', {
       replacements: [dni],
       type: QueryTypes.RAW,
     });
